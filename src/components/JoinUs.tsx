@@ -17,6 +17,8 @@ export default function JoinUs() {
   // Form States
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
+    phone: "",
     university: "",
     age: "",
     motivation: "",
@@ -48,6 +50,8 @@ export default function JoinUs() {
             setIsSuccess(true);
             setFormData({
               name: "",
+              email: "",
+              phone: "",
               university: "",
               age: "",
               motivation: "",
@@ -138,7 +142,7 @@ export default function JoinUs() {
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
               {/* Hidden field to identify the mode in EmailJS */}
-              <input type="hidden" name="application_type" value={mode === "beginner" ? "Beginner (Training)" : "Expert (Elite Team)"} />
+              <input type="hidden" name="form_type" value={mode === "beginner" ? "Beginner Application" : "Expert Application"} />
               
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
@@ -151,6 +155,33 @@ export default function JoinUs() {
                   className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
                   placeholder="John Doe"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300 ml-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300 ml-1">Phone</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
+                    placeholder="+20..."
+                  />
+                </div>
               </div>
 
               {mode === "beginner" ? (

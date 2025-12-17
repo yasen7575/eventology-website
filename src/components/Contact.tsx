@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { Mail, Phone, Send, Loader2, ExternalLink } from "lucide-react";
 import { useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
 
@@ -57,16 +57,26 @@ export default function Contact() {
               Companies, Student Activities, and Organization Leaders—let's make your next event legendary.
             </p>
 
-            <div className="space-y-8">
+            <div className="space-y-8 mb-12">
               <ContactItem icon={<Mail size={24} />} title="Email Us" value="ya3777250@gmail.com" />
               <ContactItem icon={<Phone size={24} />} title="Call Us" value="+201128209072" />
             </div>
+
+            <a 
+              href="https://linktr.ee/Eventology.Link" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-300 shadow-lg shadow-blue-900/50 group"
+            >
+              Connect with Us
+              <ExternalLink size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
           </div>
 
           {/* Contact Form */}
           <div className="bg-[#1e293b]/50 p-8 rounded-3xl border border-white/5">
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-              <input type="hidden" name="form_type" value="Contact Form" />
+              <input type="hidden" name="form_type" value="Contact Us" />
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300">Name</label>

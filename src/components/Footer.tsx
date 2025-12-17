@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
+import { Mail, Phone, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
@@ -14,11 +14,15 @@ export default function Footer() {
             <p className="text-slate-400 text-sm leading-relaxed mb-6">
               The ultimate bridge between ambitious students and world-class events. From learning to leading.
             </p>
-            <div className="flex gap-4">
-              <SocialLink href="#" icon={<Facebook size={18} />} />
-              <SocialLink href="#" icon={<Instagram size={18} />} />
-              <SocialLink href="#" icon={<Linkedin size={18} />} />
-            </div>
+            <a 
+              href="https://linktr.ee/Eventology.Link" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 hover:bg-blue-600 text-white font-medium text-sm transition-all duration-300 group"
+            >
+              Connect with Us
+              <ExternalLink size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
           </div>
 
           {/* Quick Links */}
@@ -63,16 +67,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300"
-    >
-      {icon}
-    </a>
   );
 }
