@@ -37,9 +37,9 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6"
         >
-          From Learning <br />
+          Event from <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
-            to Leading.
+            A to Z.
           </span>
         </motion.h1>
 
@@ -70,7 +70,8 @@ export default function Hero() {
           </Link>
 
           <Link
-            href="#join"
+            href="https://linktr.ee/Eventology.Link"
+            target="_blank"
             className="group px-8 py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all border border-white/10 hover:border-blue-500/50 flex items-center gap-2"
           >
             <Users size={20} className="text-blue-400" />

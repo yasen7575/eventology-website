@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import emailjs from "@emailjs/browser";
 
 type FormMode = "beginner" | "expert";
 
@@ -11,6 +12,7 @@ export default function JoinUs() {
   const [mode, setMode] = useState<FormMode>("beginner");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Form States
   const [formData, setFormData] = useState({
@@ -30,27 +32,38 @@ export default function JoinUs() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form Submitted:", { mode, ...formData });
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      
-      // Reset after showing success
-      setTimeout(() => {
-        setIsSuccess(false);
-        setFormData({
-          name: "",
-          university: "",
-          age: "",
-          motivation: "",
-          specialty: "Web Development",
-          portfolio: "",
-          experience: "",
-        });
-      }, 3000);
-    }, 1500);
+
+    if (formRef.current) {
+      emailjs
+        .sendForm(
+          "service_eprnvim",
+          "template_scrsv1p",
+          formRef.current,
+          "ivm-LYIlxfzPm0nFk"
+        )
+        .then(
+          (result) => {
+            console.log(result.text);
+            setIsSubmitting(false);
+            setIsSuccess(true);
+            setFormData({
+              name: "",
+              university: "",
+              age: "",
+              motivation: "",
+              specialty: "Web Development",
+              portfolio: "",
+              experience: "",
+            });
+            setTimeout(() => setIsSuccess(false), 5000);
+          },
+          (error) => {
+            console.log(error.text);
+            setIsSubmitting(false);
+            alert("An error occurred, please try again.");
+          }
+        );
+    }
   };
 
   return (
@@ -123,7 +136,10 @@ export default function JoinUs() {
               )}
             </AnimatePresence>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+              {/* Hidden field to identify the mode in EmailJS */}
+              <input type="hidden" name="application_type" value={mode === "beginner" ? "Beginner (Training)" : "Expert (Elite Team)"} />
+              
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
                 <input

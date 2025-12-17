@@ -99,7 +99,7 @@ export default function About() {
         {/* Stats Counter */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-16">
           <StatItem end={50} label="Events Organized" icon={<Trophy size={20} />} suffix="+" />
-          <StatItem end={2000} label="Volunteers" icon={<Users size={20} />} suffix="+" />
+          <StatItem end={200} label="Volunteers" icon={<Users size={20} />} suffix="+" />
           <StatItem end={24} label="Elite Members" icon={<Briefcase size={20} />} suffix="" />
           <StatItem end={100} label="Client Satisfaction" icon={<Users size={20} />} suffix="%" />
         </div>

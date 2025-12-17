@@ -1,16 +1,42 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { useState } from "react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+    setIsSubmitting(true);
+
+    if (formRef.current) {
+      emailjs
+        .sendForm(
+          "service_eprnvim",
+          "template_scrsv1p",
+          formRef.current,
+          "ivm-LYIlxfzPm0nFk"
+        )
+        .then(
+          (result) => {
+            console.log(result.text);
+            setIsSubmitting(false);
+            setSubmitted(true);
+            formRef.current?.reset();
+            setTimeout(() => setSubmitted(false), 5000);
+          },
+          (error) => {
+            console.log(error.text);
+            setIsSubmitting(false);
+            alert("An error occurred, please try again.");
+          }
+        );
+    }
   };
 
   return (
@@ -32,20 +58,21 @@ export default function Contact() {
             </p>
 
             <div className="space-y-8">
-              <ContactItem icon={<Mail size={24} />} title="Email Us" value="business@eventology.com" />
-              <ContactItem icon={<Phone size={24} />} title="Call Us" value="+20 123 456 7890" />
-              <ContactItem icon={<MapPin size={24} />} title="Visit HQ" value="Nile University, Sheikh Zayed, Egypt" />
+              <ContactItem icon={<Mail size={24} />} title="Email Us" value="ya3777250@gmail.com" />
+              <ContactItem icon={<Phone size={24} />} title="Call Us" value="+201128209072" />
             </div>
           </div>
 
           {/* Contact Form */}
           <div className="bg-[#1e293b]/50 p-8 rounded-3xl border border-white/5">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+              <input type="hidden" name="form_type" value="Contact Form" />
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300">Name</label>
                   <input
                     type="text"
+                    name="name"
                     required
                     className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                     placeholder="Your Name"
@@ -55,6 +82,7 @@ export default function Contact() {
                   <label className="text-sm font-medium text-slate-300">Company</label>
                   <input
                     type="text"
+                    name="company"
                     required
                     className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                     placeholder="Company Name"
@@ -66,6 +94,7 @@ export default function Contact() {
                 <label className="text-sm font-medium text-slate-300">Email</label>
                 <input
                   type="email"
+                  name="email"
                   required
                   className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                   placeholder="john@company.com"
@@ -75,6 +104,7 @@ export default function Contact() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">Message</label>
                 <textarea
+                  name="message"
                   required
                   className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white h-32 resize-none"
                   placeholder="How can we help you?"
@@ -83,9 +113,16 @@ export default function Contact() {
 
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
               >
-                {submitted ? "Message Sent!" : (
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={18} /> Sending...
+                  </>
+                ) : submitted ? (
+                  "Message Sent!"
+                ) : (
                   <>
                     Send Message <Send size={18} />
                   </>

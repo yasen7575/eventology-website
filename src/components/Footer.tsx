@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Linkedin, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
@@ -17,7 +17,6 @@ export default function Footer() {
             <div className="flex gap-4">
               <SocialLink href="#" icon={<Facebook size={18} />} />
               <SocialLink href="#" icon={<Instagram size={18} />} />
-              <SocialLink href="#" icon={<Twitter size={18} />} />
               <SocialLink href="#" icon={<Linkedin size={18} />} />
             </div>
           </div>
@@ -28,7 +27,6 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-slate-400">
               <li><Link href="#about" className="hover:text-blue-400 transition-colors">About Us</Link></li>
               <li><Link href="#services" className="hover:text-blue-400 transition-colors">Services</Link></li>
-              <li><Link href="#portfolio" className="hover:text-blue-400 transition-colors">Portfolio</Link></li>
               <li><Link href="#join" className="hover:text-blue-400 transition-colors">Careers</Link></li>
             </ul>
           </div>
@@ -50,15 +48,11 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-slate-400">
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-blue-500" />
-                <span>hello@eventology.com</span>
+                <span>ya3777250@gmail.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={16} className="text-blue-500" />
-                <span>+20 123 456 7890</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <MapPin size={16} className="text-blue-500" />
-                <span>Cairo, Egypt</span>
+                <span>+201128209072</span>
               </li>
             </ul>
           </div>
@@ -66,10 +60,6 @@ export default function Footer() {
 
         <div className="border-t border-white/5 pt-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Eventology. All rights reserved.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-          </div>
         </div>
       </div>
     </footer>
