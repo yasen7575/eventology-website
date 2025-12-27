@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { ThemeMode } from "@/app/page";
 
 const navLinks = [
   { name: "Home", href: "/#home" },
@@ -14,7 +15,11 @@ const navLinks = [
   { name: "Contact", href: "/#contact" },
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  mode: ThemeMode;
+}
+
+export default function Navbar({ mode }: NavbarProps) {
   const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,6 +35,8 @@ export default function Navbar() {
 
   const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
+  const isCommunity = mode === "community";
+
   return (
     <>
       <header
@@ -41,7 +48,12 @@ export default function Navbar() {
         <div className="container mx-auto px-6 flex justify-between items-center">
           <Link
             href="/"
-            className="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"
+            className={cn(
+                "text-2xl font-bold tracking-tighter bg-clip-text text-transparent transition-all duration-700",
+                isCommunity
+                ? "bg-gradient-to-r from-cyan-400 to-pink-500 font-mono"
+                : "bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 font-sans uppercase tracking-widest"
+            )}
           >
             Eventology
           </Link>
@@ -52,7 +64,10 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium hover:text-blue-400 transition-colors"
+                className={cn(
+                    "text-sm font-medium transition-colors duration-300",
+                    isCommunity ? "hover:text-cyan-400 text-slate-300" : "hover:text-amber-400 text-slate-400"
+                )}
               >
                 {link.name}
               </Link>
@@ -64,7 +79,10 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-medium"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs">
+                  <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center text-white text-xs",
+                      isCommunity ? "bg-gradient-to-r from-cyan-500 to-pink-500" : "bg-gradient-to-r from-amber-500 to-yellow-600"
+                  )}>
                     {user.name.charAt(0)}
                   </div>
                   <span>{user.name.split(" ")[0]}</span>
@@ -106,7 +124,12 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/#join"
-                  className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-sm hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-shadow"
+                  className={cn(
+                      "px-5 py-2 rounded-full font-medium text-sm transition-all duration-300",
+                      isCommunity
+                      ? "bg-gradient-to-r from-cyan-500 to-pink-500 text-white hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]"
+                      : "bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                  )}
                 >
                   Join Team
                 </Link>
@@ -117,7 +140,10 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             onClick={toggleMenu}
-            className="md:hidden p-2 text-white hover:text-blue-400 transition-colors"
+            className={cn(
+                "md:hidden p-2 transition-colors",
+                isCommunity ? "text-white hover:text-cyan-400" : "text-amber-100 hover:text-amber-400"
+            )}
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
