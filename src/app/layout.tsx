@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "The elite event organizing community in Egypt connecting students to volunteering opportunities and providing full-service agency solutions.",
 };
 
+import { AuthProvider } from "@/context/AuthContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,9 +23,11 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased bg-[#0f172a] text-slate-50 min-h-screen flex flex-col`}
       >
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
