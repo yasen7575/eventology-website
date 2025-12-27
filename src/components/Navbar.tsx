@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium transition-colors duration-300 hover:text-blue-400 text-slate-300"
+                className="text-sm font-medium hover:text-blue-400 transition-colors"
               >
                 {link.name}
               </Link>
@@ -64,7 +64,7 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-medium"
                 >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs bg-gradient-to-r from-blue-500 to-purple-500">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs">
                     {user.name.charAt(0)}
                   </div>
                   <span>{user.name.split(" ")[0]}</span>
@@ -106,7 +106,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/#join"
-                  className="px-5 py-2 rounded-full font-medium text-sm transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20"
+                  className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-sm hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-shadow"
                 >
                   Join Team
                 </Link>
@@ -117,7 +117,7 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             onClick={toggleMenu}
-            className="md:hidden p-2 transition-colors text-white hover:text-blue-400"
+            className="md:hidden p-2 text-white hover:text-blue-400 transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

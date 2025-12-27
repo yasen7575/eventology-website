@@ -7,9 +7,43 @@
    - Network:       http://192.168.0.2:3000
 
  ✓ Starting...
- ✓ Ready in 1097ms
+ ✓ Ready in 1055ms
  ○ Compiling / ...
-You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour.
- GET / 200 in 6.8s (compile: 6.2s, render: 583ms)
- ✓ Compiled in 2.9s
- GET / 200 in 2.6s (compile: 1772ms, render: 844ms)
+ GET / 200 in 7.8s (compile: 6.7s, render: 1131ms)
+ ✓ Compiled in 938ms
+ ⨯ ./src/app/page.tsx:4:1
+Module not found: Can't resolve '@/components/Portfolio'
+[0m [90m 2 |[39m [36mimport[39m [33mAbout[39m [36mfrom[39m [32m"@/components/About"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m [33mServices[39m [36mfrom[39m [32m"@/components/Services"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mPortfolio[39m [36mfrom[39m [32m"@/components/Portfolio"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m [36mimport[39m [33mJoinUs[39m [36mfrom[39m [32m"@/components/JoinUs"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[39m [33mContact[39m [36mfrom[39m [32m"@/components/Contact"[39m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to relative './src/components/Portfolio' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./src/app/page.tsx:4:1
+Module not found: Can't resolve '@/components/Portfolio'
+[0m [90m 2 |[39m [36mimport[39m [33mAbout[39m [36mfrom[39m [32m"@/components/About"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m [33mServices[39m [36mfrom[39m [32m"@/components/Services"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mPortfolio[39m [36mfrom[39m [32m"@/components/Portfolio"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m [36mimport[39m [33mJoinUs[39m [36mfrom[39m [32m"@/components/JoinUs"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[39m [33mContact[39m [36mfrom[39m [32m"@/components/Contact"[39m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to relative './src/components/Portfolio' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ✓ Compiled in 131ms
+ GET / 200 in 2.7s (compile: 1357ms, render: 1336ms)
+ ✓ Compiled in 1971ms
+ GET / 200 in 3.9s (compile: 1780ms, render: 2.1s)
