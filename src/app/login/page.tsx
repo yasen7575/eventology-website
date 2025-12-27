@@ -56,64 +56,55 @@ export default function LoginPage() {
                             required
                         />
 
-                        <div className="space-y-1">
-                            <Input
-                                label="Password"
-                                type="password"
-                                placeholder="••••••••"
-                                icon={<Lock size={18} />}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                            <div className="flex justify-end">
-                                <Link
-                                    href="#"
-                                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
-                        </div>
-
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                            {isLoading ? (
-                                <Loader2 className="animate-spin" size={20} />
-                            ) : (
-                                <>
-                                    Sign In
-                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    {/* Footer */}
-                    <div className="mt-8 text-center text-sm text-slate-400">
-                        Don't have an account?{" "}
-                        <Link
-                            href="/signup"
-                            className="text-white hover:text-blue-400 font-medium transition-colors"
-                        >
-                            Create Account
-                        </Link>
-                    </div>
+                        <Input
+                            label="Password"
+                            type="password"
+                            placeholder="••••••••"
+                            icon={<Lock size={18} />}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
                 </div>
-            </motion.div>
+
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
+                    >
+                        {error}
+                    </motion.div>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    {isLoading ? (
+                        <Loader2 className="animate-spin" size={20} />
+                    ) : (
+                        <>
+                            Sign In
+                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                    )}
+                </button>
+            </form>
+
+            {/* Footer */}
+            <div className="mt-8 text-center text-sm text-slate-400">
+                Don't have an account?{" "}
+                <Link
+                    href="/signup"
+                    className="text-white hover:text-blue-400 font-medium transition-colors"
+                >
+                    Create Account
+                </Link>
+            </div>
         </div>
+            </motion.div >
+        </div >
     );
 }
