@@ -18,6 +18,7 @@ export interface AuthResponse {
 
 const STORAGE_KEY = "eventology_users";
 const SESSION_KEY = "eventology_session";
+const PENDING_STORAGE_KEY = "eventology_pending_registrations";
 
 // Helper to delay execution to simulate network latency
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -36,7 +37,7 @@ export const authApi = {
         const users: any[] = usersStr ? JSON.parse(usersStr) : [];
 
         // Find user by Email OR Name
-        const user = users.find((u) => 
+        const user = users.find((u) =>
             (u.email === identifier || u.name === identifier) && u.password === password
         );
 
@@ -44,8 +45,9 @@ export const authApi = {
             throw new Error("Invalid credentials");
         }
 
+        // Double check verification (though only verified users should be in STORAGE_KEY now)
         if (!user.isVerified) {
-            throw new Error("Account not verified. Please check your email for the code.");
+            throw new Error("Account not verified.");
         }
 
         // Create session
@@ -77,7 +79,7 @@ export const authApi = {
         const usersStr = localStorage.getItem(STORAGE_KEY);
         const users: any[] = usersStr ? JSON.parse(usersStr) : [];
 
-        // Check if user exists
+        // Check if user exists in PERMANENT storage
         if (users.some((u) => u.email === email || u.name === name)) {
             throw new Error("Email or Username already exists");
         }
@@ -90,9 +92,9 @@ export const authApi = {
             await emailjs.send(
                 "service_eprnvim",
                 "template_wr5ios5",
-                { 
-                    otp: otp, 
-                    user_email: email 
+                {
+                    otp: otp,
+                    user_email: email
                 },
                 "ivm-LYIlxfzPm0nFk"
             );
@@ -101,8 +103,8 @@ export const authApi = {
             throw new Error("Failed to send verification email. Please try again.");
         }
 
-        // Create new user (Unverified)
-        const newUser = {
+        // Create new Pending Registration
+        const pendingUser = {
             id: crypto.randomUUID(),
             name,
             email,
@@ -112,48 +114,72 @@ export const authApi = {
             createdAt: new Date().toISOString(),
         };
 
-        // Save to storage
-        users.push(newUser);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+        // Save to PENDING storage (Overwrite existing attempt if exists)
+        const pendingStr = localStorage.getItem(PENDING_STORAGE_KEY);
+        let pendingUsers: any[] = pendingStr ? JSON.parse(pendingStr) : [];
 
-        return { 
-            user: null, 
+        // Remove previous attempts for this email
+        pendingUsers = pendingUsers.filter(u => u.email !== email);
+        pendingUsers.push(pendingUser);
+
+        localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingUsers));
+
+        return {
+            user: null,
             requiresVerification: true,
             email: email,
-            message: "Verification code sent to your email" 
+            message: "Verification code sent to your email"
         };
     },
 
     verifyOtp: async (email: string, code: string): Promise<AuthResponse> => {
         await delay(1000);
 
-         const usersStr = localStorage.getItem(STORAGE_KEY);
-        const users: any[] = usersStr ? JSON.parse(usersStr) : [];
-        
-        const userIndex = users.findIndex(u => u.email === email);
-        
-        if (userIndex === -1) {
-             throw new Error("User not found");
+        // Check Pending Storage
+        const pendingStr = localStorage.getItem(PENDING_STORAGE_KEY);
+        let pendingUsers: any[] = pendingStr ? JSON.parse(pendingStr) : [];
+
+        const pendingIndex = pendingUsers.findIndex(u => u.email === email);
+
+        if (pendingIndex === -1) {
+            throw new Error("No pending registration found. Please sign up again.");
         }
 
-        const user = users[userIndex];
+        const pendingUser = pendingUsers[pendingIndex];
 
-        if (user.otp !== code) {
+        if (pendingUser.otp !== code) {
             throw new Error("Invalid verification code");
         }
 
-        // Update user to verified
-        users[userIndex].isVerified = true;
-        users[userIndex].otp = null; // Clear OTP
+        // Move to Permanent Storage
+        const usersStr = localStorage.getItem(STORAGE_KEY);
+        const users: any[] = usersStr ? JSON.parse(usersStr) : [];
+
+        // Final check for duplicates (race condition safety)
+        if (users.some(u => u.email === email)) {
+            throw new Error("User already verified.");
+        }
+
+        const newUser = {
+            ...pendingUser,
+            isVerified: true,
+            otp: null
+        };
+
+        users.push(newUser);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
 
+        // Remove from Pending
+        pendingUsers.splice(pendingIndex, 1);
+        localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingUsers));
+
         const authUser: User = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
             isVerified: true
         };
-         const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
+        const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
 
         return { user: authUser, token };
     },
@@ -182,5 +208,6 @@ export const authApi = {
     wipeDatabase: () => {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(PENDING_STORAGE_KEY);
     }
 };
