@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 type FormMode = "beginner" | "expert";
 
 export default function JoinUs() {
+  // Enforcing feature-rich state
   const [mode, setMode] = useState<FormMode>("beginner");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
