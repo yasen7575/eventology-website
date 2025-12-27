@@ -37,9 +37,9 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6"
         >
-          Event from <br />
+          Your Vision. <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
-            A to Z.
+            Flawless Execution.
           </span>
         </motion.h1>
 
@@ -49,8 +49,9 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          The ultimate bridge between ambitious students and world-class events. 
-          Join the elite team delivering high-tech, full-service event solutions.
+          From cost-effective community support to elite professional management.
+          <br className="hidden md:block" />
+          We deliver full-service event operations tailored to your scale and budget.
         </motion.p>
 
         <motion.div
