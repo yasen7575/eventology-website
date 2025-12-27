@@ -3,39 +3,45 @@
 import { motion } from "framer-motion";
 import { Mail, Phone, Send, Loader2, ExternalLink } from "lucide-react";
 import { useState, useRef } from "react";
-import emailjs from "@emailjs/browser";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     if (formRef.current) {
-      emailjs
-        .sendForm(
-          "service_eprnvim",
-          "template_scrsv1p",
-          formRef.current,
-          "ivm-LYIlxfzPm0nFk"
-        )
-        .then(
-          (result) => {
-            console.log(result.text);
-            setIsSubmitting(false);
-            setSubmitted(true);
-            formRef.current?.reset();
-            setTimeout(() => setSubmitted(false), 5000);
-          },
-          (error) => {
-            console.log(error.text);
-            setIsSubmitting(false);
-            alert("An error occurred, please try again.");
-          }
-        );
+      try {
+        const emailjs = (await import("@emailjs/browser")).default;
+        emailjs
+          .sendForm(
+            "service_eprnvim",
+            "template_scrsv1p",
+            formRef.current,
+            "ivm-LYIlxfzPm0nFk"
+          )
+          .then(
+            (result) => {
+              console.log(result.text);
+              setIsSubmitting(false);
+              setSubmitted(true);
+              formRef.current?.reset();
+              setTimeout(() => setSubmitted(false), 5000);
+            },
+            (error) => {
+              console.log(error.text);
+              setIsSubmitting(false);
+              alert("An error occurred, please try again.");
+            }
+          );
+      } catch (error) {
+        console.error("Failed to load emailjs", error);
+        setIsSubmitting(false);
+        alert("An error occurred, please try again.");
+      }
     }
   };
 

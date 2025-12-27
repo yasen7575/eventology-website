@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import emailjs from "@emailjs/browser";
 
 export default function JoinUs() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,11 +24,49 @@ export default function JoinUs() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     if (formRef.current) {
+      try {
+        const emailjs = (await import("@emailjs/browser")).default;
+        emailjs
+          .sendForm(
+            "service_eprnvim",
+            "template_scrsv1p",
+            formRef.current,
+            "ivm-LYIlxfzPm0nFk"
+          )
+          .then(
+            (result) => {
+              console.log(result.text);
+              setIsSubmitting(false);
+              setIsSuccess(true);
+              setFormData({
+                name: "",
+                email: "",
+                phone: "",
+                university: "",
+                age: "",
+                motivation: "",
+                specialty: "Web Development",
+                portfolio: "",
+                experience: "",
+              });
+              setTimeout(() => setIsSuccess(false), 5000);
+            },
+            (error) => {
+              console.log(error.text);
+              setIsSubmitting(false);
+              alert("An error occurred, please try again.");
+            }
+          );
+      } catch (error) {
+        console.error("Failed to load emailjs", error);
+        setIsSubmitting(false);
+        alert("An error occurred, please try again.");
+      }
       emailjs
         .sendForm(
           "service_eprnvim",
