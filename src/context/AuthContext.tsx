@@ -9,10 +9,12 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string) => Promise<void>;
+    login: (identifier: string, password: string) => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<{ requiresVerification?: boolean; email?: string }>;
+    verify: (email: string, code: string) => Promise<void>;
     logout: () => Promise<void>;
     clearError: () => void;
+    wipeDatabase: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,14 +43,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         initAuth();
     }, []);
 
-    const login = async (email: string, password: string) => {
+    const login = async (identifier: string, password: string) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await authApi.login(email, password);
-            setUser(response.user);
-            authApi.persistSession(response.user);
-            router.push("/");
+            const response = await authApi.login(identifier, password);
+            if (response.user) {
+                setUser(response.user);
+                authApi.persistSession(response.user);
+                router.push("/");
+            }
         } catch (err: any) {
             setError(err.message || "Failed to login");
             throw err;
@@ -62,11 +66,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(null);
         try {
             const response = await authApi.register(name, email, password);
-            setUser(response.user);
-            authApi.persistSession(response.user);
-            router.push("/");
+
+            if (response.requiresVerification) {
+                // Do NOT set user session yet
+                return { requiresVerification: true, email: response.email };
+            }
+
+            if (response.user) {
+                setUser(response.user);
+                authApi.persistSession(response.user);
+                router.push("/");
+            }
+            return {};
         } catch (err: any) {
             setError(err.message || "Failed to register");
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const verify = async (email: string, code: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await authApi.verifyOtp(email, code);
+            if (response.user) {
+                setUser(response.user);
+                authApi.persistSession(response.user);
+                router.push("/");
+            }
+        } catch (err: any) {
+            setError(err.message || "Verification failed");
             throw err;
         } finally {
             setIsLoading(false);
@@ -87,6 +118,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const wipeDatabase = () => {
+        authApi.wipeDatabase();
+        setUser(null);
+        router.push("/login");
+    }
+
     const clearError = () => setError(null);
 
     return (
@@ -98,8 +135,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 error,
                 login,
                 register,
+                verify,
                 logout,
                 clearError,
+                wipeDatabase
             }}
         >
             {children}

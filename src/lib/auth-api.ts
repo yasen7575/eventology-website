@@ -1,13 +1,19 @@
+import emailjs from '@emailjs/browser';
+
 export interface User {
     id: string;
     name: string;
     email: string;
     avatar?: string;
+    isVerified: boolean;
 }
 
 export interface AuthResponse {
-    user: User;
-    token: string;
+    user: User | null; // User is null if verification is required
+    token?: string;
+    requiresVerification?: boolean;
+    email?: string;
+    message?: string;
 }
 
 const STORAGE_KEY = "eventology_users";
@@ -17,23 +23,29 @@ const SESSION_KEY = "eventology_session";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const authApi = {
-    login: async (email: string, password: string): Promise<AuthResponse> => {
+    login: async (identifier: string, password: string): Promise<AuthResponse> => {
         await delay(1500); // Simulate network request
 
         // Validation
-        if (!email || !password) {
-            throw new Error("Email and password are required");
+        if (!identifier || !password) {
+            throw new Error("Username/Email and password are required");
         }
 
         // Get users from storage
         const usersStr = localStorage.getItem(STORAGE_KEY);
         const users: any[] = usersStr ? JSON.parse(usersStr) : [];
 
-        // Find user
-        const user = users.find((u) => u.email === email && u.password === password);
+        // Find user by Email OR Name
+        const user = users.find((u) => 
+            (u.email === identifier || u.name === identifier) && u.password === password
+        );
 
         if (!user) {
-            throw new Error("Invalid email or password");
+            throw new Error("Invalid credentials");
+        }
+
+        if (!user.isVerified) {
+            throw new Error("Account not verified. Please check your email for the code.");
         }
 
         // Create session
@@ -41,6 +53,7 @@ export const authApi = {
             id: user.id,
             name: user.name,
             email: user.email,
+            isVerified: true
         };
 
         // "Token" is just a mock string for now
@@ -65,16 +78,37 @@ export const authApi = {
         const users: any[] = usersStr ? JSON.parse(usersStr) : [];
 
         // Check if user exists
-        if (users.some((u) => u.email === email)) {
-            throw new Error("Email is already registered");
+        if (users.some((u) => u.email === email || u.name === name)) {
+            throw new Error("Email or Username already exists");
         }
 
-        // Create new user
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Send OTP via EmailJS
+        try {
+            await emailjs.send(
+                "service_eprnvim",
+                "template_wr5ios5",
+                { 
+                    otp: otp, 
+                    user_email: email 
+                },
+                "ivm-LYIlxfzPm0nFk"
+            );
+        } catch (error) {
+            console.error("EmailJS Error:", error);
+            throw new Error("Failed to send verification email. Please try again.");
+        }
+
+        // Create new user (Unverified)
         const newUser = {
             id: crypto.randomUUID(),
             name,
             email,
             password, // In a real app, this would be hashed!
+            otp,
+            isVerified: false,
             createdAt: new Date().toISOString(),
         };
 
@@ -82,13 +116,44 @@ export const authApi = {
         users.push(newUser);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
 
-        const authUser: User = {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
+        return { 
+            user: null, 
+            requiresVerification: true,
+            email: email,
+            message: "Verification code sent to your email" 
         };
+    },
 
-        const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
+    verifyOtp: async (email: string, code: string): Promise<AuthResponse> => {
+        await delay(1000);
+
+         const usersStr = localStorage.getItem(STORAGE_KEY);
+        const users: any[] = usersStr ? JSON.parse(usersStr) : [];
+        
+        const userIndex = users.findIndex(u => u.email === email);
+        
+        if (userIndex === -1) {
+             throw new Error("User not found");
+        }
+
+        const user = users[userIndex];
+
+        if (user.otp !== code) {
+            throw new Error("Invalid verification code");
+        }
+
+        // Update user to verified
+        users[userIndex].isVerified = true;
+        users[userIndex].otp = null; // Clear OTP
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+
+        const authUser: User = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            isVerified: true
+        };
+         const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
 
         return { user: authUser, token };
     },
@@ -110,6 +175,12 @@ export const authApi = {
     },
 
     clearSession: () => {
+        localStorage.removeItem(SESSION_KEY);
+    },
+
+    // Utility to wipe database for testing
+    wipeDatabase: () => {
+        localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(SESSION_KEY);
     }
 };

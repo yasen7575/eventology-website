@@ -4,18 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/Input";
-import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
     const { login, isLoading, error } = useAuth();
-    const [email, setEmail] = useState("");
+    const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await login(email, password);
+            await login(identifier, password);
         } catch (err) {
             // Error handled by context
         }
@@ -47,12 +47,12 @@ export default function LoginPage() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <Input
-                            label="Email Address"
-                            type="email"
-                            placeholder="name@example.com"
-                            icon={<Mail size={18} />}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            label="Username or Email"
+                            type="text"
+                            placeholder="john or john@example.com"
+                            icon={<User size={18} />}
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
                             required
                         />
 
@@ -65,46 +65,45 @@ export default function LoginPage() {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? (
+                                <Loader2 className="animate-spin" size={20} />
+                            ) : (
+                                <>
+                                    Sign In
+                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                </>
+                            )}
+                        </button>
+                    </form>
+
+                    {/* Footer */}
+                    <div className="mt-8 text-center text-sm text-slate-400">
+                        Don't have an account?{" "}
+                        <Link
+                            href="/signup"
+                            className="text-white hover:text-blue-400 font-medium transition-colors"
+                        >
+                            Create Account
+                        </Link>
+                    </div>
                 </div>
-
-                {error && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
-                    >
-                        {error}
-                    </motion.div>
-                )}
-
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                    {isLoading ? (
-                        <Loader2 className="animate-spin" size={20} />
-                    ) : (
-                        <>
-                            Sign In
-                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                        </>
-                    )}
-                </button>
-            </form>
-
-            {/* Footer */}
-            <div className="mt-8 text-center text-sm text-slate-400">
-                Don't have an account?{" "}
-                <Link
-                    href="/signup"
-                    className="text-white hover:text-blue-400 font-medium transition-colors"
-                >
-                    Create Account
-                </Link>
-            </div>
+            </motion.div>
         </div>
-            </motion.div >
-        </div >
     );
 }
