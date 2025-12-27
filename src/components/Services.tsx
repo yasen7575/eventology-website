@@ -1,196 +1,177 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Check, X, Shield, Users, Zap, Star, Layout, UserCog, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Users, Monitor, Camera, Megaphone, Terminal, Award } from "lucide-react";
+import { ThemeMode } from "@/app/page";
+import { cn } from "@/lib/utils";
 
-export default function Services() {
+interface ServicesProps {
+  mode: ThemeMode;
+}
+
+export default function Services({ mode }: ServicesProps) {
+  const isCommunity = mode === "community";
+
+  const services = [
+    {
+        title: "Digital & Tech",
+        icon: <Monitor size={24} />,
+        community: {
+            detail: "Websites & Reg Forms",
+            executor: "Junior Developers",
+            desc: "Custom landing pages built by our rising tech talent."
+        },
+        elite: {
+            detail: "Enterprise Platforms",
+            executor: "Senior Engineers",
+            desc: "Scalable, secure registration systems with API integrations."
+        }
+    },
+    {
+        title: "Media Production",
+        icon: <Camera size={24} />,
+        community: {
+            detail: "Event Coverage",
+            executor: "Media Students",
+            desc: "Photo/Video documentation to capture the vibe."
+        },
+        elite: {
+            detail: "Cinema-Grade",
+            executor: "Creative Directors",
+            desc: "High-end commercials, live broadcasting, and post-production."
+        }
+    },
+    {
+        title: "On-Ground Ops",
+        icon: <Users size={24} />,
+        community: {
+            detail: "Crowd Management",
+            executor: "Volunteers",
+            desc: "Energetic ushers to guide guests and manage flow."
+        },
+        elite: {
+            detail: "White-Glove Service",
+            executor: "Pro Managers",
+            desc: "VIP protocol, security coordination, and crisis handling."
+        }
+    },
+    {
+        title: "Marketing",
+        icon: <Megaphone size={24} />,
+        community: {
+            detail: "Social Buzz",
+            executor: "Content Creators",
+            desc: "Viral campaigns driven by youth trends."
+        },
+        elite: {
+            detail: "Brand Strategy",
+            executor: "Marketing Leads",
+            desc: "Data-driven campaigns with measurable ROI."
+        }
+    }
+  ];
+
   return (
-    <section id="services" className="py-24 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-[128px] pointer-events-none" />
+    <section id="services" className="py-24 relative overflow-hidden transition-colors duration-700">
+        {/* Background Elements */}
+        {isCommunity ? (
+            <>
+                <div className="absolute top-1/2 left-0 w-96 h-96 bg-cyan-600/10 rounded-full blur-[128px] pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-600/10 rounded-full blur-[128px] pointer-events-none" />
+            </>
+        ) : (
+            <>
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[150px] pointer-events-none" />
+            </>
+        )}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
           <motion.h2
+            key={mode}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mb-6"
+            className={cn(
+                "text-3xl md:text-5xl font-bold mb-6",
+                isCommunity ? "font-mono" : "font-sans"
+            )}
           >
-            One Platform. <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Two Levels of Execution.</span>
+            {isCommunity ? (
+                <>Level 1 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">Capabilities</span></>
+            ) : (
+                <>Premium <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500">Solutions</span></>
+            )}
           </motion.h2>
-          <p className="text-slate-400 max-w-3xl mx-auto text-lg">
-            We offer the same comprehensive full-service capabilities across both tiers.
-            The difference is in the workforce: <strong>Choose the execution integration that fits your scale and budget.</strong>
+          <p className={cn(
+              "max-w-3xl mx-auto text-lg",
+              isCommunity ? "text-cyan-100/60 font-mono text-sm" : "text-slate-400 font-sans"
+          )}>
+            {isCommunity
+             ? "High energy execution powered by the Talent Pipeline. Perfect for student activities, non-profits, and budget-friendly activations."
+             : "Flawless delivery by the Core Team. Designed for corporate summits, international conferences, and high-stakes launches."}
           </p>
         </div>
 
-        {/* Comparison Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {services.map((service, index) => {
+                const data = isCommunity ? service.community : service.elite;
+                return (
+                    <motion.div
+                        key={`${mode}-${index}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: index * 0.1 }}
+                        className={cn(
+                            "group p-1 rounded-2xl relative overflow-hidden",
+                            isCommunity ? "bg-gradient-to-br from-cyan-500/20 to-pink-500/20" : "bg-gradient-to-br from-white/5 to-white/10 hover:from-amber-500/20 hover:to-amber-600/20 transition-all"
+                        )}
+                    >
+                        <div className={cn(
+                            "h-full rounded-[14px] p-6 relative overflow-hidden flex flex-col justify-between",
+                            isCommunity ? "bg-slate-900/90" : "bg-black/90"
+                        )}>
+                            {/* Icon & Title */}
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className={cn(
+                                    "p-3 rounded-xl",
+                                    isCommunity ? "bg-cyan-500/20 text-cyan-400" : "bg-amber-500/10 text-amber-400"
+                                )}>
+                                    {service.icon}
+                                </div>
+                                <div>
+                                    <h3 className={cn("text-xl font-bold text-white", isCommunity ? "font-mono" : "font-sans")}>{service.title}</h3>
+                                    <div className={cn("text-xs font-bold uppercase tracking-wider", isCommunity ? "text-pink-400" : "text-slate-500")}>
+                                        {data.executor}
+                                    </div>
+                                </div>
+                            </div>
 
-          {/* Tier 1: Community */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative p-1 rounded-3xl bg-gradient-to-br from-white/5 to-white/10"
-          >
-            <div className="h-full bg-[#0f172a] rounded-[22px] p-8 md:p-10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5">
-                <Users size={200} />
-              </div>
+                            {/* Description */}
+                            <div className="mb-4">
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    {data.desc}
+                                </p>
+                            </div>
 
-              {/* Header */}
-              <div className="relative z-10 mb-8 border-b border-white/10 pb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">
-                  Tier 1
-                </div>
-                <h3 className="text-3xl font-bold text-white mb-2">The Community</h3>
-                <p className="text-slate-400 text-sm mb-4">Ideally suits student activities & non-profits.</p>
-                <div className="text-2xl font-bold text-white">Free / Low Cost</div>
-                <p className="text-xs text-slate-500 mt-1">Covered by "The Talent Pipeline"</p>
-              </div>
-
-              {/* Execution Specs */}
-              <div className="space-y-6 relative z-10">
-                <ServiceRow
-                  title="Tech Solutions"
-                  detail="Custom Websites & forms"
-                  executor="Junior Developers"
-                  isElite={false}
-                />
-                <ServiceRow
-                  title="Guest Experience"
-                  detail="Ushers & Crowd Mgmt"
-                  executor="Student Volunteers"
-                  isElite={false}
-                />
-                <ServiceRow
-                  title="Creative Media"
-                  detail="Photo/Video Coverage"
-                  executor="Media Students"
-                  isElite={false}
-                />
-                <ServiceRow
-                  title="Operations"
-                  detail="On-site Logistics"
-                  executor="Learners (Supervised)"
-                  isElite={false}
-                />
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-dashed border-white/10">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500 mt-1">
-                    <Star size={18} />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white">The Trade-off</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Work is performed by enthusiastic learners gaining experience. High effort, strict supervision, but standard turnover risks apply.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Tier 2: Elite */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative p-1 rounded-3xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-[0_0_50px_rgba(79,70,229,0.2)]"
-          >
-            {/* "Recommended" Badge */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg z-20">
-              Recommended for Corporate
-            </div>
-
-            <div className="h-full bg-[#0b1121] rounded-[22px] p-8 md:p-10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Shield size={200} />
-              </div>
-
-              {/* Header */}
-              <div className="relative z-10 mb-8 border-b border-white/10 pb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold uppercase tracking-wider mb-4">
-                  Tier 2
-                </div>
-                <h3 className="text-3xl font-bold text-white mb-2">The Elite</h3>
-                <p className="text-slate-400 text-sm mb-4">For corporate events requiring perfection.</p>
-                <div className="text-2xl font-bold text-white">Premium</div>
-                <p className="text-xs text-slate-500 mt-1">Covered by "The Core Team"</p>
-              </div>
-
-              {/* Execution Specs */}
-              <div className="space-y-6 relative z-10">
-                <ServiceRow
-                  title="Tech Solutions"
-                  detail="Custom Websites & forms"
-                  executor="Senior Tech Leads"
-                  isElite={true}
-                />
-                <ServiceRow
-                  title="Guest Experience"
-                  detail="Call Centers & RSVP"
-                  executor="Pro Event Managers"
-                  isElite={true}
-                />
-                <ServiceRow
-                  title="Creative Media"
-                  detail="Cinema-grade Production"
-                  executor="Creative Directors"
-                  isElite={true}
-                />
-                <ServiceRow
-                  title="Operations"
-                  detail="Crisis Management"
-                  executor="Industry Experts"
-                  isElite={true}
-                />
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-dashed border-white/10">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-green-500/10 text-green-500 mt-1">
-                    <Shield size={18} />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white">The Promise</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Zero-fail guarantee. Dedicated project managers, crisis handling, and agency-level quality assurance.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
+                            {/* Badge */}
+                            <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+                                <span className={cn("text-sm font-medium", isCommunity ? "text-cyan-200" : "text-amber-200")}>
+                                    {data.detail}
+                                </span>
+                                {isCommunity ? (
+                                    <Terminal size={16} className="text-cyan-500 opacity-50" />
+                                ) : (
+                                    <Award size={16} className="text-amber-500 opacity-50" />
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            })}
         </div>
       </div>
     </section>
-  );
-}
-
-function ServiceRow({ title, detail, executor, isElite }: { title: string, detail: string, executor: string, isElite: boolean }) {
-  return (
-    <div className="flex items-center justify-between group">
-      <div className="flex items-start gap-3">
-        <div className={`p-1.5 rounded-lg mt-0.5 ${isElite ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/10 text-blue-400'}`}>
-          <Check size={14} />
-        </div>
-        <div>
-          <div className="font-semibold text-slate-200 text-sm">{title}</div>
-          <div className="text-xs text-slate-500">{detail}</div>
-        </div>
-      </div>
-      <div className="text-right">
-        <div className={`text-xs font-bold px-2 py-1 rounded-md ${isElite ? 'bg-purple-500/10 text-purple-300' : 'bg-slate-800 text-slate-400'}`}>
-          {executor}
-        </div>
-      </div>
-    </div>
   );
 }

@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Mono, Cinzel } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+// Navbar and Footer removed from here to be controlled by page state
+import { AuthProvider } from "@/context/AuthContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-space-mono",
+});
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  variable: "--font-cinzel",
+});
 
 export const metadata: Metadata = {
-  title: "Eventology | From Learning to Leading",
-  description: "The elite event organizing community in Egypt connecting students to volunteering opportunities and providing full-service agency solutions.",
+  title: "Eventology | Choose Your Engine",
+  description: "From rising talent to elite experts. The only event platform that lets you choose your execution level.",
 };
-
-import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
   children,
@@ -21,12 +33,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${inter.className} antialiased bg-[#0f172a] text-slate-50 min-h-screen flex flex-col`}
+        className={`${inter.variable} ${spaceMono.variable} ${cinzel.variable} antialiased bg-[#0f172a] text-slate-50 min-h-screen flex flex-col`}
       >
         <AuthProvider>
-          <Navbar />
           <main className="flex-grow">{children}</main>
-          <Footer />
         </AuthProvider>
       </body>
     </html>

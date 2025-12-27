@@ -5,14 +5,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import emailjs from "@emailjs/browser";
+import { ThemeMode } from "@/app/page";
 
 type FormMode = "beginner" | "expert";
 
-export default function JoinUs() {
-  const [mode, setMode] = useState<FormMode>("beginner");
+interface JoinUsProps {
+  mode: ThemeMode;
+}
+
+export default function JoinUs({ mode: siteMode }: JoinUsProps) {
+  // Sync form mode with site mode
+  const [formMode, setFormMode] = useState<FormMode>(siteMode === 'community' ? 'beginner' : 'expert');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const isCommunity = siteMode === 'community';
 
   // Form States
   const [formData, setFormData] = useState({
@@ -71,57 +79,63 @@ export default function JoinUs() {
   };
 
   return (
-    <section id="join" className="py-24 relative overflow-hidden">
+    <section id="join" className="py-24 relative overflow-hidden transition-colors duration-700">
       {/* Background Elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-1/2 h-full bg-purple-600/5 blur-[120px] pointer-events-none" />
+      {isCommunity ? (
+        <>
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-cyan-600/5 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-1/2 h-full bg-pink-600/5 blur-[120px] pointer-events-none" />
+        </>
+      ) : (
+        <>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-amber-600/5 blur-[120px] pointer-events-none" />
+        </>
+      )}
+
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Join the Movement</h2>
+          <h2 className={cn("text-3xl md:text-5xl font-bold mb-6", isCommunity ? "font-mono" : "font-sans")}>
+            {isCommunity ? "Join the Movement" : "Join the Elite Core"}
+          </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg mb-8">
-            Whether you're starting your journey or looking to lead the industry, there's a place for you at Eventology.
+            {isCommunity
+             ? "Start your journey. Gain real-world experience. Level up."
+             : "We are always scouting for top-tier talent. If you have the experience, we have the platform."}
           </p>
 
           {/* Toggle Switch */}
           <div className="inline-flex items-center bg-slate-800/50 rounded-full p-1 border border-white/10 mb-8">
             <button
-              onClick={() => setMode("beginner")}
+              onClick={() => setFormMode("beginner")}
               className={cn(
                 "px-6 py-2 rounded-full text-sm font-bold transition-all duration-300",
-                mode === "beginner" ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white"
+                formMode === "beginner"
+                    ? (isCommunity ? "bg-cyan-600 text-white shadow-lg" : "bg-slate-700 text-white")
+                    : "text-slate-400 hover:text-white"
               )}
             >
-              I am a Beginner
+              Start as Learner
             </button>
             <button
-              onClick={() => setMode("expert")}
+              onClick={() => setFormMode("expert")}
               className={cn(
                 "px-6 py-2 rounded-full text-sm font-bold transition-all duration-300",
-                mode === "expert" ? "bg-purple-600 text-white shadow-lg" : "text-slate-400 hover:text-white"
+                formMode === "expert"
+                    ? (isCommunity ? "bg-pink-600 text-white shadow-lg" : "bg-amber-600 text-white shadow-lg")
+                    : "text-slate-400 hover:text-white"
               )}
             >
-              I am an Expert
+              Apply as Expert
             </button>
           </div>
-
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={mode}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-slate-300 text-sm font-medium"
-            >
-              {mode === "beginner" 
-                ? "Join our training program to gain real-world experience." 
-                : "Ready for the big leagues? Join the Eventology Elite Team."}
-            </motion.p>
-          </AnimatePresence>
         </div>
 
         <div className="max-w-xl mx-auto">
-          <div className="glass-card p-8 md:p-10 rounded-3xl relative overflow-hidden">
+          <div className={cn(
+              "glass-card p-8 md:p-10 rounded-3xl relative overflow-hidden transition-colors duration-500",
+              isCommunity ? "border-cyan-500/20" : "border-amber-500/20"
+          )}>
             {/* Success Overlay */}
             <AnimatePresence>
               {isSuccess && (
@@ -135,14 +149,14 @@ export default function JoinUs() {
                     <Check size={40} />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Application Received!</h3>
-                  <p className="text-slate-400">We'll be in touch shortly to kickstart your journey.</p>
+                  <p className="text-slate-400">We&apos;ll be in touch shortly to kickstart your journey.</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
               {/* Hidden field to identify the mode in EmailJS */}
-              <input type="hidden" name="form_type" value={mode === "beginner" ? "Beginner Application" : "Expert Application"} />
+              <input type="hidden" name="form_type" value={formMode === "beginner" ? "Beginner Application" : "Expert Application"} />
               
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
@@ -184,7 +198,7 @@ export default function JoinUs() {
                 </div>
               </div>
 
-              {mode === "beginner" ? (
+              {formMode === "beginner" ? (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -278,9 +292,9 @@ export default function JoinUs() {
                 disabled={isSubmitting}
                 className={cn(
                   "w-full py-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2",
-                  mode === "beginner"
-                    ? "bg-blue-600 hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                    : "bg-purple-600 hover:bg-purple-700 hover:shadow-[0_0_20px_rgba(147,51,234,0.4)]",
+                  formMode === "beginner"
+                    ? (isCommunity ? "bg-cyan-600 hover:bg-cyan-700" : "bg-slate-600 hover:bg-slate-700")
+                    : (isCommunity ? "bg-pink-600 hover:bg-pink-700" : "bg-amber-600 hover:bg-amber-700"),
                   isSubmitting && "opacity-70 cursor-wait"
                 )}
               >
