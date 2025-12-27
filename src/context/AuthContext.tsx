@@ -1,20 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { authApi, User } from "@/lib/auth-api";
-import { useRouter } from "next/navigation";
+import { authApi } from "@/lib/auth-api";
+import { User } from "@/services/storage";
+import { useRouter, usePathname } from "next/navigation";
 
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
+    isAdmin: boolean;
+    isSuperAdmin: boolean;
     isLoading: boolean;
     error: string | null;
     login: (identifier: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string) => Promise<{ requiresVerification?: boolean; email?: string }>;
-    verify: (email: string, code: string) => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     clearError: () => void;
-    wipeDatabase: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const pathname = usePathname();
 
     // Load session on mount
     useEffect(() => {
@@ -43,6 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         initAuth();
     }, []);
 
+    // Protect Admin Routes
+    useEffect(() => {
+        if (isLoading) return;
+        if (pathname?.startsWith('/admin')) {
+            if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
+                router.push('/login');
+            }
+        }
+    }, [pathname, user, isLoading, router]);
+
     const login = async (identifier: string, password: string) => {
         setIsLoading(true);
         setError(null);
@@ -51,7 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (response.user) {
                 setUser(response.user);
                 authApi.persistSession(response.user);
-                router.push("/");
+                // Redirect based on role
+                if (response.user.role === 'SUPER_ADMIN' || response.user.role === 'ADMIN') {
+                    router.push("/admin");
+                } else {
+                    router.push("/");
+                }
             }
         } catch (err: any) {
             setError(err.message || "Failed to login");
@@ -66,38 +83,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(null);
         try {
             const response = await authApi.register(name, email, password);
-
-            if (response.requiresVerification) {
-                // Do NOT set user session yet
-                return { requiresVerification: true, email: response.email };
-            }
-
             if (response.user) {
                 setUser(response.user);
                 authApi.persistSession(response.user);
                 router.push("/");
             }
-            return {};
         } catch (err: any) {
             setError(err.message || "Failed to register");
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const verify = async (email: string, code: string) => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await authApi.verifyOtp(email, code);
-            if (response.user) {
-                setUser(response.user);
-                authApi.persistSession(response.user);
-                router.push("/");
-            }
-        } catch (err: any) {
-            setError(err.message || "Verification failed");
             throw err;
         } finally {
             setIsLoading(false);
@@ -118,12 +110,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const wipeDatabase = () => {
-        authApi.wipeDatabase();
-        setUser(null);
-        router.push("/login");
-    }
-
     const clearError = () => setError(null);
 
     return (
@@ -131,14 +117,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             value={{
                 user,
                 isAuthenticated: !!user,
+                isAdmin: user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN',
+                isSuperAdmin: user?.role === 'SUPER_ADMIN',
                 isLoading,
                 error,
                 login,
                 register,
-                verify,
                 logout,
                 clearError,
-                wipeDatabase
             }}
         >
             {children}

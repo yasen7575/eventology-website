@@ -1,17 +1,29 @@
-import Hero from "@/components/Hero";
-import About from "@/components/About";
-import Services from "@/components/Services";
-import JoinUs from "@/components/JoinUs";
-import Contact from "@/components/Contact";
+"use client";
+
+import Hero from '@/components/Hero';
+import CoreTeam from '@/components/CoreTeam';
+import TalentPipeline from '@/components/TalentPipeline';
+import Navbar from '@/components/Navbar';
+import Contact from '@/components/Contact';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <About />
-      <Services />
-      <JoinUs />
-      <Contact />
+      <Navbar />
+      <main className="bg-[#020617] text-white">
+        <Hero />
+        <div id="core">
+          <CoreTeam />
+        </div>
+        <div id="pipeline">
+          <TalentPipeline />
+        </div>
+        <div id="contact">
+          <Contact />
+        </div>
+      </main>
+      <Footer />
     </>
   );
 }

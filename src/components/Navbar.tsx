@@ -1,189 +1,104 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-
-const navLinks = [
-  { name: "Home", href: "/#home" },
-  { name: "About", href: "/#about" },
-  { name: "Services", href: "/#services" },
-  { name: "Contact", href: "/#contact" },
-];
+import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Menu, X, Terminal } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Hide Navbar on Admin pages
+  if (pathname?.startsWith('/admin')) return null;
 
-  const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const navLinks = [
+    { name: 'Mission', href: '/#mission' },
+    { name: 'Core Team', href: '/#core' },
+    { name: 'Pipeline', href: '/#pipeline' },
+    { name: 'Contact', href: '/#contact' },
+  ];
 
   return (
-    <>
-      <header
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          isScrolled ? "py-4 glass shadow-lg" : "py-6 bg-transparent"
-        )}
-      >
-        <div className="container mx-auto px-6 flex justify-between items-center">
-          <Link
-            href="/"
-            className="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"
-          >
-            Eventology
-          </Link>
+    <nav className="fixed w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group">
+           <div className="w-8 h-8 rounded-full border-2 border-cyan-500 flex items-center justify-center group-hover:bg-cyan-500/10 transition-colors">
+              <span className="text-cyan-400 font-bold text-lg">E</span>
+           </div>
+           <span className="text-xl font-bold tracking-tight text-white">EVENTOLOGY</span>
+        </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium hover:text-blue-400 transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-medium"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs">
-                    {user.name.charAt(0)}
-                  </div>
-                  <span>{user.name.split(" ")[0]}</span>
-                  <ChevronDown size={14} className={cn("transition-transform", userMenuOpen && "rotate-180")} />
-                </button>
-
-                <AnimatePresence>
-                  {userMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-48 rounded-xl bg-[#1e293b] border border-white/10 shadow-xl overflow-hidden"
-                    >
-                      <div className="p-3 border-b border-white/5">
-                        <p className="text-xs text-slate-400">Signed in as</p>
-                        <p className="text-sm font-medium truncate">{user.email}</p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          logout();
-                          setUserMenuOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-white/5 flex items-center gap-2 transition-colors"
-                      >
-                        <LogOut size={16} /> Sign Out
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link
-                  href="/login"
-                  className="text-sm font-medium hover:text-white text-slate-300 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/#join"
-                  className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-sm hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-shadow"
-                >
-                  Join Team
-                </Link>
-              </div>
-            )}
-          </nav>
-
-          {/* Mobile Toggle */}
-          <button
-            onClick={toggleMenu}
-            className="md:hidden p-2 text-white hover:text-blue-400 transition-colors"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium text-slate-400 hover:text-cyan-400 uppercase tracking-wider transition-colors"
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
-      </header>
 
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#0f172a]/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8"
-          >
+        {/* Auth / Action */}
+        <div className="hidden md:flex items-center gap-4">
+          {user ? (
+            <div className="flex items-center gap-4">
+               {user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' ? (
+                 <Link href="/admin" className="flex items-center gap-2 text-xs font-mono text-cyan-400 border border-cyan-900 bg-cyan-900/10 px-3 py-1.5 rounded hover:bg-cyan-900/20 transition-colors">
+                   <Terminal size={14} />
+                   MISSION CONTROL
+                 </Link>
+               ) : (
+                 <span className="text-sm text-slate-400">Welcome, {user.name}</span>
+               )}
+               <button onClick={() => logout()} className="text-sm text-slate-500 hover:text-white">Sign Out</button>
+            </div>
+          ) : (
+            <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">
+              LOGIN
+            </Link>
+          )}
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="md:hidden bg-slate-900 border-b border-slate-800 overflow-hidden"
+        >
+          <div className="px-6 py-8 flex flex-col gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-2xl font-bold hover:text-blue-400 transition-colors"
+                onClick={() => setIsOpen(false)}
+                className="text-lg font-medium text-slate-300 hover:text-cyan-400 uppercase tracking-wider"
               >
                 {link.name}
               </Link>
             ))}
-
-            {user ? (
-              <div className="flex flex-col items-center gap-4 mt-4">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
-                    {user.name.charAt(0)}
-                  </div>
-                  <p className="text-xl font-bold">Welcome, {user.name.split(" ")[0]}</p>
-                </div>
-                <button
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="px-8 py-3 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-lg"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-4 mt-4">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-xl font-medium text-slate-300 hover:text-white"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/#join"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-8 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-shadow"
-                >
-                  Join Team
-                </Link>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+             <div className="h-px bg-slate-800 my-2"></div>
+             {user ? (
+               <button onClick={() => logout()} className="text-left text-slate-400">Sign Out</button>
+             ) : (
+               <Link href="/login" onClick={() => setIsOpen(false)} className="text-cyan-400">Login</Link>
+             )}
+          </div>
+        </motion.div>
+      )}
+    </nav>
   );
 }

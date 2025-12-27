@@ -1,101 +1,95 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowRight, Users } from "lucide-react";
-import Link from "next/link";
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowRight, ShieldCheck, Activity, Cpu } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Hero() {
   return (
-    <section id="home" className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
-      {/* Dynamic Background */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      {/* Background Elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[#0f172a] opacity-90 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-purple-900/30 z-0 animate-pulse" />
-        {/* Animated Gradient Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-blob mix-blend-screen" />
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-blob animation-delay-2000 mix-blend-screen" />
-        <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-blob animation-delay-4000 mix-blend-screen" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[100px] rounded-full animate-pulse-slow"></div>
       </div>
 
-      <div className="container mx-auto px-6 relative z-20 text-center">
+      <div className="container mx-auto px-6 relative z-10 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8"
+          className="mb-8 flex justify-center"
         >
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-          </span>
-          <span className="text-sm font-medium text-blue-200">The #1 Event Community in Egypt</span>
+          {/* Using the Atom Logo Concept - Ideally this would be an Image, but using CSS representation or the uploaded image if I had a URL for it.
+              Since I can't hotlink the uploaded image easily without a public URL, I will simulate the "Atom" vibe with a placeholder or Icon.
+              Wait, I can use the image if I put it in public. But for now, let's use a high-tech SVG representation.
+          */}
+          <div className="relative w-32 h-32 md:w-48 md:h-48">
+             <div className="absolute inset-0 border-2 border-cyan-400/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
+             <div className="absolute inset-0 border-2 border-cyan-400/30 rounded-full rotate-60 animate-[spin_12s_linear_infinite]"></div>
+             <div className="absolute inset-0 border-2 border-cyan-400/30 rounded-full -rotate-60 animate-[spin_15s_linear_infinite]"></div>
+             <div className="absolute inset-0 flex items-center justify-center">
+                <Cpu size={48} className="text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
+             </div>
+          </div>
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6"
+          transition={{ delay: 0.2 }}
+          className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-6"
         >
-          Your Vision. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
-            Flawless Execution.
-          </span>
+          EVENTOLOGY
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed"
+          transition={{ delay: 0.4 }}
+          className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto mb-10 font-light"
         >
-          From cost-effective community support to elite professional management.
-          <br className="hidden md:block" />
-          We deliver full-service event operations tailored to your scale and budget.
+          Precision Engineering for <span className="text-cyan-400 font-medium">Elite Events</span>.
+          <br/>
+          From Strategic Core to Massive Scale Execution.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          transition={{ delay: 0.6 }}
+          className="flex flex-col md:flex-row gap-4 justify-center"
         >
-          <Link
-            href="#contact"
-            className="group relative px-8 py-4 bg-blue-600 text-white font-bold rounded-full overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(37,99,235,0.6)]"
-          >
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <span className="relative flex items-center gap-2">
-              Hire Eventology <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </span>
+          <Link href="#contact" className="btn-primary flex items-center justify-center gap-2 group">
+            INITIATE PROJECT
+            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
           </Link>
-
-          <Link
-            href="https://linktr.ee/Eventology.Link"
-            target="_blank"
-            className="group px-8 py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all border border-white/10 hover:border-blue-500/50 flex items-center gap-2"
-          >
-            <Users size={20} className="text-blue-400" />
-            Join the Community
+          <Link href="#pipeline" className="btn-outline">
+            JOIN THE PIPELINE
           </Link>
         </motion.div>
-      </div>
 
-      {/* Scroll Down Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-[30px] h-[50px] rounded-full border-2 border-slate-500 flex justify-center p-2">
-          <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-            className="w-1.5 h-1.5 bg-blue-400 rounded-full mb-1"
-          />
-        </div>
-      </motion.div>
+        {/* Stats / Credentials */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto border-t border-slate-800 pt-8"
+        >
+          <div className="text-center">
+            <div className="text-3xl font-bold text-white mb-1">100%</div>
+            <div className="text-xs text-slate-500 uppercase tracking-widest">Execution Rate</div>
+          </div>
+          <div className="text-center border-l border-r border-slate-800">
+            <div className="text-3xl font-bold text-white mb-1">TIER-1</div>
+            <div className="text-xs text-slate-500 uppercase tracking-widest">Personnel Standard</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-white mb-1">GLOBAL</div>
+            <div className="text-xs text-slate-500 uppercase tracking-widest">Operational Reach</div>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }
