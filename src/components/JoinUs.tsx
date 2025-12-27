@@ -4,21 +4,24 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import emailjs from "@emailjs/browser";
+import { db } from "@/services/storage";
 
 export default function JoinUs() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Form States
+  // Form States - Feature Rich Schema
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    role: "Volunteer / Student",
-    portfolio: "",
+    university: "",
+    age: "",
+    specialty: "Web Development",
     motivation: "",
+    portfolio: "",
+    experience: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -31,71 +34,50 @@ export default function JoinUs() {
 
     if (formRef.current) {
       try {
+        // 1. Send Email Notification
         const emailjs = (await import("@emailjs/browser")).default;
-        emailjs
-          .sendForm(
+        await emailjs.sendForm(
             "service_eprnvim",
             "template_scrsv1p",
             formRef.current,
             "ivm-LYIlxfzPm0nFk"
-          )
-          .then(
-            (result) => {
-              console.log(result.text);
-              setIsSubmitting(false);
-              setIsSuccess(true);
-              setFormData({
-                name: "",
-                email: "",
-                phone: "",
-                university: "",
-                age: "",
-                motivation: "",
-                specialty: "Web Development",
-                portfolio: "",
-                experience: "",
-              });
-              setTimeout(() => setIsSuccess(false), 5000);
-            },
-            (error) => {
-              console.log(error.text);
-              setIsSubmitting(false);
-              alert("An error occurred, please try again.");
-            }
-          );
+        );
+
+        // 2. Save to Mission Control Database
+        db.addApplication({
+            fullName: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            specialty: formData.specialty,
+            university: formData.university,
+            age: formData.age,
+            motivation: formData.motivation,
+            portfolio: formData.portfolio,
+            experience: formData.experience,
+            // experienceLevel is optional, can be derived later or left undefined
+        });
+
+        // Success Handler
+        setIsSubmitting(false);
+        setIsSuccess(true);
+        setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            university: "",
+            age: "",
+            specialty: "Web Development",
+            motivation: "",
+            portfolio: "",
+            experience: "",
+        });
+        setTimeout(() => setIsSuccess(false), 5000);
+
       } catch (error) {
-        console.error("Failed to load emailjs", error);
+        console.error("Submission failed", error);
         setIsSubmitting(false);
         alert("An error occurred, please try again.");
       }
-      emailjs
-        .sendForm(
-          "service_eprnvim",
-          "template_scrsv1p",
-          formRef.current,
-          "ivm-LYIlxfzPm0nFk"
-        )
-        .then(
-          (result) => {
-            console.log(result.text);
-            setIsSubmitting(false);
-            setIsSuccess(true);
-            setFormData({
-              name: "",
-              email: "",
-              phone: "",
-              role: "Volunteer / Student",
-              portfolio: "",
-              motivation: "",
-            });
-            setTimeout(() => setIsSuccess(false), 5000);
-          },
-          (error) => {
-            console.log(error.text);
-            setIsSubmitting(false);
-            alert("An error occurred, please try again.");
-          }
-        );
     }
   };
 
@@ -113,7 +95,7 @@ export default function JoinUs() {
           </p>
         </div>
 
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <div className="glass-card p-8 md:p-10 rounded-3xl relative overflow-hidden border-white/10">
             {/* Success Overlay */}
             <AnimatePresence>
@@ -134,20 +116,34 @@ export default function JoinUs() {
             </AnimatePresence>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
-                  placeholder="John Doe"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300 ml-1">Age</label>
+                    <input
+                      type="number"
+                      name="age"
+                      required
+                      value={formData.age}
+                      onChange={handleInputChange}
+                      className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
+                      placeholder="21"
+                    />
+                  </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300 ml-1">Email</label>
                   <input
@@ -175,17 +171,33 @@ export default function JoinUs() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300 ml-1">I am applying as...</label>
+                <label className="text-sm font-medium text-slate-300 ml-1">University / Organization</label>
+                <input
+                    type="text"
+                    name="university"
+                    required
+                    value={formData.university}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600"
+                    placeholder="University of ..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300 ml-1">Specialty</label>
                 <div className="relative">
                     <select
-                        name="role"
-                        value={formData.role}
+                        name="specialty"
+                        value={formData.specialty}
                         onChange={handleInputChange}
                         className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white appearance-none cursor-pointer"
                     >
-                        <option>Volunteer / Student</option>
-                        <option>Professional / Expert</option>
-                        <option>Freelancer</option>
+                        <option>Web Development</option>
+                        <option>Graphic Design</option>
+                        <option>Content Creation</option>
+                        <option>Marketing</option>
+                        <option>Logistics</option>
+                        <option>Other</option>
                     </select>
                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                         <ChevronRight className="rotate-90" size={16} />
@@ -205,15 +217,27 @@ export default function JoinUs() {
                 />
               </div>
 
+               <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300 ml-1">Experience & Skills</label>
+                <textarea
+                  name="experience"
+                  required
+                  value={formData.experience}
+                  onChange={handleInputChange}
+                  className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600 h-24 resize-none"
+                  placeholder="Tell us about your technical skills and past projects..."
+                />
+              </div>
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300 ml-1">Why Eventology?</label>
+                <label className="text-sm font-medium text-slate-300 ml-1">Why do you want to join Eventology?</label>
                 <textarea
                   name="motivation"
                   required
                   value={formData.motivation}
                   onChange={handleInputChange}
                   className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white placeholder:text-slate-600 h-24 resize-none"
-                  placeholder="Tell us a bit about yourself..."
+                  placeholder="I am passionate about..."
                 />
               </div>
 

@@ -23,8 +23,17 @@ export interface Application {
   fullName: string;
   email: string;
   phone: string;
-  expertise: string;
-  experienceLevel: 'Entry' | 'Mid' | 'Senior';
+
+  // Unified Schema Fields
+  specialty: string;           // Renamed from expertise
+  university?: string;         // New: Education
+  age?: string;                // New: Demographics
+  motivation?: string;         // New: Why join?
+  portfolio?: string;          // New: Links
+  experience?: string;         // New: Detailed text description
+
+  experienceLevel?: 'Entry' | 'Mid' | 'Senior'; // Optional now (legacy/pipeline specific)
+
   status: 'pending' | 'reviewed' | 'rejected' | 'accepted';
   timestamp: string;
 }

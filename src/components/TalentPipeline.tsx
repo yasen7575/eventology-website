@@ -8,11 +8,13 @@ import { ShieldCheck, ChevronRight, CheckCircle2 } from 'lucide-react';
 export default function TalentPipeline() {
   const [pipelineOpen, setPipelineOpen] = useState(true);
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
+
+  // Updated state to match unified schema
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    expertise: '',
+    specialty: '', // Renamed from expertise
     experienceLevel: 'Entry'
   });
 
@@ -35,6 +37,17 @@ export default function TalentPipeline() {
 
     setFormState('success');
   };
+
+  const handleReset = () => {
+    setFormState('idle');
+    setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        specialty: '',
+        experienceLevel: 'Entry'
+    });
+  }
 
   return (
     <section id="pipeline" className="py-24 bg-slate-900/30 relative border-y border-slate-800">
@@ -102,7 +115,7 @@ export default function TalentPipeline() {
                  ID: {crypto.randomUUID().split('-')[0].toUpperCase()}
                </p>
                <button
-                 onClick={() => { setFormState('idle'); setFormData({ fullName: '', email: '', phone: '', expertise: '', experienceLevel: 'Entry' }); }}
+                 onClick={handleReset}
                  className="mt-6 text-sm text-cyan-400 hover:text-cyan-300 underline"
                >
                  Submit another application
@@ -155,8 +168,8 @@ export default function TalentPipeline() {
                  placeholder="Briefly describe your expertise..."
                  rows={3}
                  className="input-field resize-none"
-                 value={formData.expertise}
-                 onChange={e => setFormData({...formData, expertise: e.target.value})}
+                 value={formData.specialty}
+                 onChange={e => setFormData({...formData, specialty: e.target.value})}
                ></textarea>
 
                <button

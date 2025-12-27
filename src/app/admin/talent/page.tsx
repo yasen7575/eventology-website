@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { db, Application } from '@/services/storage';
-import { Briefcase, Phone, Mail, Clock } from 'lucide-react';
+import { Briefcase, Phone, Mail, Clock, GraduationCap, User as UserIcon } from 'lucide-react';
 
 export default function TalentPage() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -45,17 +45,27 @@ export default function TalentPage() {
                   <div>
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
                       {app.fullName}
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                        app.experienceLevel === 'Senior' ? 'border-purple-500 text-purple-400 bg-purple-500/10' :
-                        app.experienceLevel === 'Mid' ? 'border-blue-500 text-blue-400 bg-blue-500/10' :
-                        'border-slate-500 text-slate-400 bg-slate-500/10'
-                      }`}>
-                        {app.experienceLevel.toUpperCase()}
-                      </span>
+                      {app.experienceLevel && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                          app.experienceLevel === 'Senior' ? 'border-purple-500 text-purple-400 bg-purple-500/10' :
+                          app.experienceLevel === 'Mid' ? 'border-blue-500 text-blue-400 bg-blue-500/10' :
+                          'border-slate-500 text-slate-400 bg-slate-500/10'
+                        }`}>
+                          {app.experienceLevel.toUpperCase()}
+                        </span>
+                      )}
+                      {app.age && (
+                         <span className="text-xs text-slate-500 flex items-center gap-1 ml-2">
+                           <UserIcon size={10} /> Age: {app.age}
+                         </span>
+                      )}
                     </h3>
-                    <div className="flex gap-4 mt-2 text-sm text-slate-400">
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-400">
                        <span className="flex items-center gap-1"><Mail size={12} /> {app.email}</span>
                        <span className="flex items-center gap-1"><Phone size={12} /> {app.phone}</span>
+                       {app.university && (
+                         <span className="flex items-center gap-1"><GraduationCap size={12} /> {app.university}</span>
+                       )}
                     </div>
                   </div>
                   <div className="text-xs text-slate-500 flex items-center gap-1">
@@ -64,9 +74,24 @@ export default function TalentPage() {
                 </div>
 
                 <div className="bg-slate-950 p-3 rounded border border-slate-800 text-sm text-slate-300">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider block mb-1">Expertise / Skills</span>
-                  {app.expertise}
+                  <span className="text-slate-500 text-xs uppercase tracking-wider block mb-1">Specialty / Skills</span>
+                  {app.specialty}
                 </div>
+
+                {app.experience && (
+                   <div className="text-xs text-slate-400 italic mt-2">
+                     <span className="text-slate-600 font-bold not-italic">Experience: </span>
+                     {app.experience.length > 150 ? app.experience.substring(0, 150) + "..." : app.experience}
+                   </div>
+                )}
+
+                {app.portfolio && (
+                   <div className="text-xs">
+                     <a href={app.portfolio} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">
+                        View Portfolio
+                     </a>
+                   </div>
+                )}
               </div>
 
               <div className="flex md:flex-col gap-2 justify-center border-t md:border-t-0 md:border-l border-slate-800 pt-4 md:pt-0 md:pl-6 min-w-[140px]">
