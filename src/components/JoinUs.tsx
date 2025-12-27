@@ -15,7 +15,8 @@ export default function JoinUs() {
   const formRef = useRef<HTMLFormElement>(null);
 
   // Form States
-  const [formData, setFormData] = useState({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [formData, setFormData] = useState<any>({
     name: "",
     email: "",
     phone: "",
