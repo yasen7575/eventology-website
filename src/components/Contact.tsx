@@ -46,7 +46,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-[#0b1120] relative">
+    <section id="contact" className="py-24 relative bg-[#0f172a]">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
           {/* Contact Info */}
@@ -55,12 +55,12 @@ export default function Contact() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold mb-6"
+              className="text-3xl md:text-5xl font-bold mb-6 text-white"
             >
-              Ready to <span className="text-blue-500">Collaborate?</span>
+              Get in Touch
             </motion.h2>
-            <p className="text-slate-400 text-lg mb-12">
-              Companies, Student Activities, and Organization Leaders—let's make your next event legendary.
+            <p className="text-lg mb-12 text-slate-400">
+              Ready to elevate your next event? Contact our team to discuss your requirements.
             </p>
 
             <div className="space-y-8 mb-12">
@@ -72,7 +72,7 @@ export default function Contact() {
               href="https://linktr.ee/Eventology.Link" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-300 shadow-lg shadow-blue-900/50 group"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all duration-300 shadow-lg group bg-blue-600 hover:bg-blue-700 text-white shadow-blue-900/50"
             >
               Connect with Us
               <ExternalLink size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -80,9 +80,8 @@ export default function Contact() {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-[#1e293b]/50 p-8 rounded-3xl border border-white/5">
+          <div className="p-8 rounded-3xl border border-white/10 bg-slate-800/50">
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-              <input type="hidden" name="form_type" value="Contact Us" />
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300">Name</label>
@@ -90,7 +89,7 @@ export default function Contact() {
                     type="text"
                     name="name"
                     required
-                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-all"
                     placeholder="Your Name"
                   />
                 </div>
@@ -100,7 +99,7 @@ export default function Contact() {
                     type="text"
                     name="company"
                     required
-                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-all"
                     placeholder="Company Name"
                   />
                 </div>
@@ -112,7 +111,7 @@ export default function Contact() {
                   type="email"
                   name="email"
                   required
-                  className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-all"
                   placeholder="john@company.com"
                 />
               </div>
@@ -122,7 +121,7 @@ export default function Contact() {
                 <textarea
                   name="message"
                   required
-                  className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white h-32 resize-none"
+                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-all h-32 resize-none"
                   placeholder="How can we help you?"
                 />
               </div>
@@ -130,7 +129,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
+                className="w-full py-4 font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait text-white hover:shadow-lg bg-blue-600 hover:bg-blue-700 hover:shadow-blue-500/25"
               >
                 {isSubmitting ? (
                   <>
@@ -155,11 +154,11 @@ export default function Contact() {
 function ContactItem({ icon, title, value }: { icon: React.ReactNode; title: string; value: string }) {
   return (
     <div className="flex items-center gap-4 group cursor-pointer">
-      <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+      <div className="w-14 h-14 rounded-full flex items-center justify-center text-slate-400 transition-all duration-300 bg-blue-500/10 group-hover:bg-blue-600 group-hover:text-white">
         {icon}
       </div>
       <div>
-        <h4 className="font-bold text-white group-hover:text-blue-400 transition-colors">{title}</h4>
+        <h4 className="font-bold transition-colors text-white group-hover:text-blue-400">{title}</h4>
         <p className="text-slate-400">{value}</p>
       </div>
     </div>

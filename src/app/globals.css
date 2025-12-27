@@ -1,17 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f172a; /* Deep Charcoal */
+  --background: #0f172a;
   --foreground: #f8fafc;
-  --accent-blue: #3b82f6; /* Electric Blue */
-  --accent-purple: #8b5cf6;
+
+  --primary: #3b82f6;
+  --secondary: #8b5cf6;
+
   --glass-bg: rgba(15, 23, 42, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
+  --surface: rgba(255, 255, 255, 0.05);
 }
 
 @theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-surface: var(--surface);
   
   --animate-blob: blob 7s infinite;
   
@@ -30,7 +38,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased;
+    @apply antialiased font-sans;
   }
 }
 
@@ -42,9 +50,10 @@
   }
   
   .glass-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
   }
   
   .animation-delay-2000 {
