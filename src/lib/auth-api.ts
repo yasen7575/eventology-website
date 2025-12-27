@@ -23,6 +23,18 @@ const PENDING_STORAGE_KEY = "eventology_pending_registrations";
 // Helper to delay execution to simulate network latency
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function hashPassword(password: string, salt: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + salt);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateSalt(): string {
+    return crypto.randomUUID();
+}
+
 export const authApi = {
     login: async (identifier: string, password: string): Promise<AuthResponse> => {
         await delay(1500); // Simulate network request
@@ -37,12 +49,19 @@ export const authApi = {
         const users: any[] = usersStr ? JSON.parse(usersStr) : [];
 
         // Find user by Email OR Name
-        const user = users.find((u) =>
-            (u.email === identifier || u.name === identifier) && u.password === password
-        );
+        // We first find the user to get their salt
+        const user = users.find((u) => u.email === identifier || u.name === identifier);
 
         if (!user) {
             throw new Error("Invalid credentials");
+        }
+
+        // Verify password
+        const salt = user.salt || ""; // Handle legacy users without salt if any (though we assume new DB)
+        const passwordHash = await hashPassword(password, salt);
+
+        if (user.password !== passwordHash) {
+             throw new Error("Invalid credentials");
         }
 
         // Double check verification (though only verified users should be in STORAGE_KEY now)
@@ -103,12 +122,16 @@ export const authApi = {
             throw new Error("Failed to send verification email. Please try again.");
         }
 
+        const salt = generateSalt();
+        const passwordHash = await hashPassword(password, salt);
+
         // Create new Pending Registration
         const pendingUser = {
             id: crypto.randomUUID(),
             name,
             email,
-            password, // In a real app, this would be hashed!
+            password: passwordHash, // Hashed password
+            salt,
             otp,
             isVerified: false,
             createdAt: new Date().toISOString(),
