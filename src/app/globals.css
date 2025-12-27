@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Base variables - Defaulting to Community for fallback */
   --background: #0f172a;
   --foreground: #f8fafc;
 
@@ -13,32 +12,8 @@
   --surface: rgba(255, 255, 255, 0.05);
 }
 
-.theme-community {
-  --background: #050510;
-  --foreground: #e0f2fe;
-  --primary: #00f3ff;   /* Neon Cyan */
-  --secondary: #d946ef; /* Neon Pink */
-  --surface: rgba(0, 243, 255, 0.05);
-  --glass-bg: rgba(5, 5, 16, 0.8);
-  --glass-border: rgba(0, 243, 255, 0.2);
-  --font-heading: var(--font-space-mono); /* Tech feel */
-}
-
-.theme-elite {
-  --background: #000000;
-  --foreground: #f8fafc;
-  --primary: #d4af37;   /* Gold */
-  --secondary: #94a3b8; /* Slate */
-  --surface: rgba(212, 175, 55, 0.03);
-  --glass-bg: rgba(10, 10, 10, 0.9);
-  --glass-border: rgba(212, 175, 55, 0.15);
-  --font-heading: var(--font-cinzel); /* Premium feel */
-}
-
 @theme {
   --font-sans: var(--font-inter);
-  --font-mono: var(--font-space-mono);
-  --font-serif: var(--font-cinzel);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -63,11 +38,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased transition-colors duration-700 ease-in-out font-sans;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading, var(--font-sans));
+    @apply antialiased font-sans;
   }
 }
 
@@ -91,48 +62,5 @@
   
   .animation-delay-4000 {
     animation-delay: 4s;
-  }
-
-  /* Glitch Effect for Community */
-  .glitch {
-    position: relative;
-  }
-  .glitch::before,
-  .glitch::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-  .glitch::before {
-    left: 2px;
-    text-shadow: -1px 0 red;
-    clip: rect(44px, 450px, 56px, 0);
-    animation: glitch-anim-1 5s infinite linear alternate-reverse;
-  }
-  .glitch::after {
-    left: -2px;
-    text-shadow: -1px 0 blue;
-    clip: rect(44px, 450px, 56px, 0);
-    animation: glitch-anim-2 5s infinite linear alternate-reverse;
-  }
-
-  @keyframes glitch-anim-1 {
-    0% { clip: rect(20px, 9999px, 80px, 0); }
-    20% { clip: rect(60px, 9999px, 10px, 0); }
-    40% { clip: rect(80px, 9999px, 30px, 0); }
-    60% { clip: rect(10px, 9999px, 90px, 0); }
-    80% { clip: rect(50px, 9999px, 50px, 0); }
-    100% { clip: rect(30px, 9999px, 70px, 0); }
-  }
-  @keyframes glitch-anim-2 {
-    0% { clip: rect(80px, 9999px, 20px, 0); }
-    20% { clip: rect(10px, 9999px, 60px, 0); }
-    40% { clip: rect(30px, 9999px, 80px, 0); }
-    60% { clip: rect(90px, 9999px, 10px, 0); }
-    80% { clip: rect(50px, 9999px, 50px, 0); }
-    100% { clip: rect(70px, 9999px, 30px, 0); }
   }
 }

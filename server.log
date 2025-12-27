@@ -11,3 +11,5 @@
  ○ Compiling / ...
 You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour.
  GET / 200 in 6.8s (compile: 6.2s, render: 583ms)
+ ✓ Compiled in 2.9s
+ GET / 200 in 2.6s (compile: 1772ms, render: 844ms)
