@@ -1,0 +1,4 @@
+## 2025-02-18 - Client-Side Password Storage Vulnerability
+**Vulnerability:** Passwords were being stored in plain text in `localStorage` for a mock authentication system.
+**Learning:** Even in mock or simulation environments, storing sensitive data in plain text is a bad practice as it models insecurity. Client-side storage (localStorage) is inherently insecure for sensitive data, but if it must be used for a simulation, hashing is a minimal requirement.
+**Prevention:** Always apply basic security principles (like hashing passwords) even in prototypes or mocks to prevent these habits from leaking into production code. Used `crypto.subtle` for browser-native hashing.
