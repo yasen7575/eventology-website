@@ -31,9 +31,9 @@ export default function Footer() {
           <div>
             <h3 className="font-bold mb-6 text-white">Platform</h3>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li><Link href="#about" className="transition-colors hover:text-blue-400">About Us</Link></li>
-              <li><Link href="#services" className="transition-colors hover:text-blue-400">Services</Link></li>
-              <li><Link href="#join" className="transition-colors hover:text-blue-400">Careers</Link></li>
+              <li><Link href="#mission" className="transition-colors hover:text-blue-400">Mission</Link></li>
+              <li><Link href="#core-team" className="transition-colors hover:text-blue-400">Core Team</Link></li>
+              <li><Link href="#pipeline" className="transition-colors hover:text-blue-400">The Pipeline</Link></li>
             </ul>
           </div>
 

@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import emailjs from "@emailjs/browser";
 
 export default function JoinUs() {
   const [isSubmitting, setIsSubmitting] = useState(false);
