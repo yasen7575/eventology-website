@@ -3,39 +3,46 @@
 import { motion } from "framer-motion";
 import { Mail, Phone, Send, Loader2, ExternalLink } from "lucide-react";
 import { useState, useRef } from "react";
-import emailjs from "@emailjs/browser";
+import { StorageService } from "@/services/storage";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Note: For simplicity and since requirements didn't specify toggling the Contact form separately
+  // or blocking it, I am assuming the "Recruitment Forms" toggle applies mainly to JoinUs (Talent Pipeline).
+  // However, I will hook it up to save to internal storage.
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    if (formRef.current) {
-      emailjs
-        .sendForm(
-          "service_eprnvim",
-          "template_scrsv1p",
-          formRef.current,
-          "ivm-LYIlxfzPm0nFk"
-        )
-        .then(
-          (result) => {
-            console.log(result.text);
-            setIsSubmitting(false);
-            setSubmitted(true);
-            formRef.current?.reset();
-            setTimeout(() => setSubmitted(false), 5000);
-          },
-          (error) => {
-            console.log(error.text);
-            setIsSubmitting(false);
-            alert("An error occurred, please try again.");
-          }
-        );
+    // Get form data
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const name = formData.get("name") as string;
+    const company = formData.get("company") as string;
+    const email = formData.get("email") as string;
+    const message = formData.get("message") as string;
+
+    try {
+       await new Promise(resolve => setTimeout(resolve, 1000));
+
+       StorageService.addInquiry({
+           name,
+           company,
+           email,
+           message
+       });
+
+       setIsSubmitting(false);
+       setSubmitted(true);
+       formRef.current?.reset();
+       setTimeout(() => setSubmitted(false), 5000);
+    } catch (error) {
+       console.error(error);
+       setIsSubmitting(false);
+       alert("An error occurred, please try again.");
     }
   };
 

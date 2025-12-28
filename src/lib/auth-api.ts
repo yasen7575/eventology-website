@@ -1,11 +1,9 @@
+import { StorageService, User as StorageUser } from "@/services/storage";
 import emailjs from '@emailjs/browser';
 
-export interface User {
-    id: string;
-    name: string;
-    email: string;
+// Re-export User type to match what AuthContext expects
+export interface User extends Omit<StorageUser, "password"> {
     avatar?: string;
-    isVerified: boolean;
 }
 
 export interface AuthResponse {
@@ -16,7 +14,6 @@ export interface AuthResponse {
     message?: string;
 }
 
-const STORAGE_KEY = "eventology_users";
 const SESSION_KEY = "eventology_session";
 const PENDING_STORAGE_KEY = "eventology_pending_registrations";
 
@@ -32,31 +29,21 @@ export const authApi = {
             throw new Error("Username/Email and password are required");
         }
 
-        // Get users from storage
-        const usersStr = localStorage.getItem(STORAGE_KEY);
-        const users: any[] = usersStr ? JSON.parse(usersStr) : [];
-
-        // Find user by Email OR Name
-        const user = users.find((u) =>
-            (u.email === identifier || u.name === identifier) && u.password === password
-        );
+        // Use StorageService for centralized logic (handles Super Admin check internally)
+        const user = StorageService.validateCredentials(identifier, password);
 
         if (!user) {
             throw new Error("Invalid credentials");
         }
 
-        // Double check verification (though only verified users should be in STORAGE_KEY now)
+        // Double check verification
         if (!user.isVerified) {
             throw new Error("Account not verified.");
         }
 
-        // Create session
-        const authUser: User = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            isVerified: true
-        };
+        // Create session object (remove password)
+        const { password: _, ...safeUser } = user;
+        const authUser: User = safeUser;
 
         // "Token" is just a mock string for now
         const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
@@ -76,12 +63,10 @@ export const authApi = {
             throw new Error("Password must be at least 6 characters");
         }
 
-        const usersStr = localStorage.getItem(STORAGE_KEY);
-        const users: any[] = usersStr ? JSON.parse(usersStr) : [];
-
-        // Check if user exists in PERMANENT storage
-        if (users.some((u) => u.email === email || u.name === name)) {
-            throw new Error("Email or Username already exists");
+        // Check if user exists in StorageService
+        const existingUser = StorageService.getUserByEmail(email);
+        if (existingUser) {
+            throw new Error("Email already exists");
         }
 
         // Generate 6-digit OTP
@@ -100,6 +85,8 @@ export const authApi = {
             );
         } catch (error) {
             console.error("EmailJS Error:", error);
+            // Allow registration to proceed in dev even if email fails?
+            // For strict requirement, we throw. But maybe we should log it.
             throw new Error("Failed to send verification email. Please try again.");
         }
 
@@ -108,13 +95,13 @@ export const authApi = {
             id: crypto.randomUUID(),
             name,
             email,
-            password, // In a real app, this would be hashed!
+            password, // Stored temporarily until verification
             otp,
             isVerified: false,
             createdAt: new Date().toISOString(),
         };
 
-        // Save to PENDING storage (Overwrite existing attempt if exists)
+        // Save to PENDING storage
         const pendingStr = localStorage.getItem(PENDING_STORAGE_KEY);
         let pendingUsers: any[] = pendingStr ? JSON.parse(pendingStr) : [];
 
@@ -151,34 +138,24 @@ export const authApi = {
             throw new Error("Invalid verification code");
         }
 
-        // Move to Permanent Storage
-        const usersStr = localStorage.getItem(STORAGE_KEY);
-        const users: any[] = usersStr ? JSON.parse(usersStr) : [];
-
-        // Final check for duplicates (race condition safety)
-        if (users.some(u => u.email === email)) {
-            throw new Error("User already verified.");
-        }
-
-        const newUser = {
-            ...pendingUser,
-            isVerified: true,
-            otp: null
+        // Move to Permanent Storage via StorageService
+        const newUser: StorageUser = {
+            id: pendingUser.id,
+            name: pendingUser.name,
+            email: pendingUser.email,
+            password: pendingUser.password,
+            role: "user", // Default role
+            isVerified: true
         };
 
-        users.push(newUser);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+        StorageService.saveUser(newUser);
 
         // Remove from Pending
         pendingUsers.splice(pendingIndex, 1);
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingUsers));
 
-        const authUser: User = {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            isVerified: true
-        };
+        const { password: _, ...safeUser } = newUser;
+        const authUser: User = safeUser;
         const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
 
         return { user: authUser, token };
@@ -186,7 +163,6 @@ export const authApi = {
 
     logout: async (): Promise<void> => {
         await delay(500);
-        // In a real app, we might invalidate the token on the server
     },
 
     // Helper to persist session
@@ -206,7 +182,7 @@ export const authApi = {
 
     // Utility to wipe database for testing
     wipeDatabase: () => {
-        localStorage.removeItem(STORAGE_KEY);
+        StorageService.wipeAll();
         localStorage.removeItem(SESSION_KEY);
         localStorage.removeItem(PENDING_STORAGE_KEY);
     }

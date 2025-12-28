@@ -1,0 +1,100 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Eventology" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e5]:
+        - link "Home" [ref=e6] [cursor=pointer]:
+          - /url: /#home
+        - link "About" [ref=e7] [cursor=pointer]:
+          - /url: /#about
+        - link "Services" [ref=e8] [cursor=pointer]:
+          - /url: /#services
+        - link "Contact" [ref=e9] [cursor=pointer]:
+          - /url: /#contact
+        - button "R Regular" [ref=e11]:
+          - generic [ref=e12]: R
+          - generic [ref=e13]: Regular
+          - img [ref=e14]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - complementary [ref=e18]:
+        - generic [ref=e19]:
+          - heading "Mission Control" [level=1] [ref=e20]
+          - paragraph [ref=e21]: Admin Dashboard
+        - navigation [ref=e22]:
+          - button "Talent Pipeline" [ref=e23]:
+            - generic [ref=e24]:
+              - img [ref=e25]
+              - generic [ref=e30]: Talent Pipeline
+          - button "Inquiries" [ref=e31]:
+            - generic [ref=e32]:
+              - img [ref=e33]
+              - generic [ref=e35]: Inquiries
+          - button "Settings" [ref=e36]:
+            - generic [ref=e37]:
+              - img [ref=e38]
+              - generic [ref=e41]: Settings
+        - generic [ref=e43]:
+          - generic [ref=e44]: R
+          - generic [ref=e45]:
+            - paragraph [ref=e46]: Regular User
+            - paragraph [ref=e47]: regular@example.com
+      - main [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - heading "Talent Pipeline" [level=2] [ref=e51]
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - img [ref=e54]
+                - textbox "Search candidates..." [ref=e57]
+              - generic [ref=e58]:
+                - button "All" [ref=e59]
+                - button "Beginners" [ref=e60]
+                - button "Experts" [ref=e61]
+          - generic [ref=e63]: No applications found.
+  - contentinfo [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - link "Eventology" [ref=e68] [cursor=pointer]:
+            - /url: "#home"
+          - paragraph [ref=e69]: The ultimate bridge between ambitious students and world-class events. From learning to leading.
+          - link "Connect with Us" [ref=e70] [cursor=pointer]:
+            - /url: https://linktr.ee/Eventology.Link
+            - text: Connect with Us
+            - img [ref=e71]
+        - generic [ref=e75]:
+          - heading "Company" [level=3] [ref=e76]
+          - list [ref=e77]:
+            - listitem [ref=e78]:
+              - link "About Us" [ref=e79] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e80]:
+              - link "Services" [ref=e81] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e82]:
+              - link "Careers" [ref=e83] [cursor=pointer]:
+                - /url: "#join"
+        - generic [ref=e84]:
+          - heading "Services" [level=3] [ref=e85]
+          - list [ref=e86]:
+            - listitem [ref=e87]: Event Management
+            - listitem [ref=e88]: Web Development
+            - listitem [ref=e89]: Creative Media
+            - listitem [ref=e90]: Logistics & Ushers
+        - generic [ref=e91]:
+          - heading "Contact" [level=3] [ref=e92]
+          - list [ref=e93]:
+            - listitem [ref=e94]:
+              - img [ref=e95]
+              - generic [ref=e98]: ya3777250@gmail.com
+            - listitem [ref=e99]:
+              - img [ref=e100]
+              - generic [ref=e102]: "+201128209072"
+      - paragraph [ref=e104]: © 2025 Eventology. All rights reserved.
+  - alert [ref=e105]
+```
