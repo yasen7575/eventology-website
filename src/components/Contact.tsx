@@ -61,7 +61,7 @@ export default function Contact() {
               Ready to <span className="text-blue-500">Collaborate?</span>
             </motion.h2>
             <p className="text-slate-400 text-lg mb-12">
-              Companies, Student Activities, and Organization Leaders—let's make your next event legendary.
+              Companies, Student Activities, and Organization Leaders—let&apos;s make your next event legendary.
             </p>
 
             <div className="space-y-8 mb-12">
@@ -86,8 +86,9 @@ export default function Contact() {
               <input type="hidden" name="form_type" value="Contact Us" />
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Name</label>
+                  <label htmlFor="name" className="text-sm font-medium text-slate-300">Name</label>
                   <input
+                    id="name"
                     type="text"
                     name="name"
                     required
@@ -96,8 +97,9 @@ export default function Contact() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Company</label>
+                  <label htmlFor="company" className="text-sm font-medium text-slate-300">Company</label>
                   <input
+                    id="company"
                     type="text"
                     name="company"
                     required
@@ -108,8 +110,9 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Email</label>
+                <label htmlFor="email" className="text-sm font-medium text-slate-300">Email</label>
                 <input
+                  id="email"
                   type="email"
                   name="email"
                   required
@@ -119,8 +122,9 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Message</label>
+                <label htmlFor="message" className="text-sm font-medium text-slate-300">Message</label>
                 <textarea
+                  id="message"
                   name="message"
                   required
                   className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white h-32 resize-none"
