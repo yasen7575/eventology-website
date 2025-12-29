@@ -1,9 +1,12 @@
+import dynamic from 'next/dynamic';
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Services from "@/components/Services";
-import Portfolio from "@/components/Portfolio";
-import JoinUs from "@/components/JoinUs";
-import Contact from "@/components/Contact";
+
+// Lazy load below-the-fold components to reduce initial bundle size and improve TTI
+const Portfolio = dynamic(() => import("@/components/Portfolio"));
+const JoinUs = dynamic(() => import("@/components/JoinUs"));
+const Contact = dynamic(() => import("@/components/Contact"));
 
 export default function Home() {
   return (
