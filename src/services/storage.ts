@@ -47,12 +47,12 @@ const STORAGE_KEYS = {
 const SUPER_ADMIN: User = {
     id: "super_admin_001",
     name: "System Administrator",
-    email: "ya3777250@gmail.com",
+    email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
     role: "super_admin",
     isVerified: true
 };
 
-const SUPER_ADMIN_PASS = "Ak998877";
+const SUPER_ADMIN_PASS = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "";
 
 export const StorageService = {
     // --- Users ---
@@ -71,13 +71,19 @@ export const StorageService = {
     },
 
     getUserByEmail: (email: string): User | undefined => {
-        if (email === SUPER_ADMIN.email) return SUPER_ADMIN;
+        if (email === SUPER_ADMIN.email && SUPER_ADMIN.email) return SUPER_ADMIN;
         const users = StorageService.getUsers();
         return users.find(u => u.email === email);
     },
 
     // Special Auth Check for Super Admin
     validateCredentials: (email: string, password: string): User | null => {
+        // Ensure env vars are set before allowing super admin login
+        if (!SUPER_ADMIN.email || !SUPER_ADMIN_PASS) {
+            console.error("Super Admin credentials not configured.");
+            return null;
+        }
+
         if (email === SUPER_ADMIN.email && password === SUPER_ADMIN_PASS) {
             return SUPER_ADMIN;
         }
