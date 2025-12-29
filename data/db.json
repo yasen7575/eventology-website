@@ -84,6 +84,18 @@
       "id": "6398d0a6-a677-4ad7-9ebf-19a46f5eacb9",
       "createdAt": "2025-12-29T22:42:00.667Z",
       "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "96967b1b-d15c-4d8f-8f13-dedd197c61cf",
+      "createdAt": "2025-12-29T22:57:24.878Z",
+      "status": "pending"
     }
   ],
   "inquiries": [],
