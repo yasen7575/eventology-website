@@ -1,5 +1,5 @@
+// src/lib/auth-api.ts
 import { StorageService, User as StorageUser } from "@/services/storage";
-import emailjs from '@emailjs/browser';
 
 // Re-export User type to match what AuthContext expects
 export interface User extends Omit<StorageUser, "password"> {
@@ -22,33 +22,18 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const authApi = {
     login: async (identifier: string, password: string): Promise<AuthResponse> => {
-        await delay(1500); // Simulate network request
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier, password }),
+        });
 
-        // Validation
-        if (!identifier || !password) {
-            throw new Error("Username/Email and password are required");
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to login");
         }
 
-        // Use StorageService for centralized logic (handles Super Admin check internally)
-        const user = StorageService.validateCredentials(identifier, password);
-
-        if (!user) {
-            throw new Error("Invalid credentials");
-        }
-
-        // Double check verification
-        if (!user.isVerified) {
-            throw new Error("Account not verified.");
-        }
-
-        // Create session object (remove password)
-        const { password: _, ...safeUser } = user;
-        const authUser: User = safeUser;
-
-        // "Token" is just a mock string for now
-        const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
-
-        return { user: authUser, token };
+        return response.json();
     },
 
     register: async (name: string, email: string, password: string): Promise<AuthResponse> => {
@@ -64,7 +49,7 @@ export const authApi = {
         }
 
         // Check if user exists in StorageService
-        const existingUser = StorageService.getUserByEmail(email);
+        const existingUser = await StorageService.getUserByEmail(email);
         if (existingUser) {
             throw new Error("Email already exists");
         }
@@ -85,8 +70,6 @@ export const authApi = {
             );
         } catch (error) {
             console.error("EmailJS Error:", error);
-            // Allow registration to proceed in dev even if email fails?
-            // For strict requirement, we throw. But maybe we should log it.
             throw new Error("Failed to send verification email. Please try again.");
         }
 
@@ -139,22 +122,19 @@ export const authApi = {
         }
 
         // Move to Permanent Storage via StorageService
-        const newUser: StorageUser = {
-            id: pendingUser.id,
+        const newUser: Omit<StorageUser, 'id' | 'isVerified' | 'role'> = {
             name: pendingUser.name,
             email: pendingUser.email,
             password: pendingUser.password,
-            role: "user", // Default role
-            isVerified: true
         };
 
-        StorageService.saveUser(newUser);
+        const savedUser = await StorageService.saveUser(newUser);
 
         // Remove from Pending
         pendingUsers.splice(pendingIndex, 1);
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingUsers));
 
-        const { password: _, ...safeUser } = newUser;
+        const { password, ...safeUser } = savedUser;
         const authUser: User = safeUser;
         const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
 

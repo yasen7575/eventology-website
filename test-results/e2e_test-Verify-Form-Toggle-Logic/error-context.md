@@ -1,0 +1,103 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Eventology" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e5]:
+        - link "Home" [ref=e6] [cursor=pointer]:
+          - /url: /#home
+        - link "About" [ref=e7] [cursor=pointer]:
+          - /url: /#about
+        - link "Services" [ref=e8] [cursor=pointer]:
+          - /url: /#services
+        - link "Contact" [ref=e9] [cursor=pointer]:
+          - /url: /#contact
+        - button "S System" [ref=e11]:
+          - generic [ref=e12]: S
+          - generic [ref=e13]: System
+          - img [ref=e14]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - complementary [ref=e18]:
+        - generic [ref=e19]:
+          - heading "Mission Control" [level=1] [ref=e20]
+          - paragraph [ref=e21]: Admin Dashboard
+        - navigation [ref=e22]:
+          - button "Talent Pipeline" [ref=e23]:
+            - generic [ref=e24]:
+              - img [ref=e25]
+              - generic [ref=e30]: Talent Pipeline
+          - button "Inquiries" [ref=e31]:
+            - generic [ref=e32]:
+              - img [ref=e33]
+              - generic [ref=e35]: Inquiries
+          - button "Settings" [active] [ref=e36]:
+            - generic [ref=e37]:
+              - img [ref=e38]
+              - generic [ref=e41]: Settings
+          - button "Users" [ref=e42]:
+            - generic [ref=e43]:
+              - img [ref=e44]
+              - generic [ref=e49]: Users
+        - generic [ref=e51]:
+          - generic [ref=e52]: S
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: System Administrator
+            - paragraph [ref=e55]: ya3777250@gmail.com
+      - main [ref=e56]:
+        - generic [ref=e57]:
+          - heading "System Settings" [level=2] [ref=e58]
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - heading "Recruitment Forms" [level=3] [ref=e62]
+                - paragraph [ref=e63]: Enable or disable public access to the Join Us application forms.
+              - button [ref=e64]
+            - paragraph [ref=e67]: System Version 2.1.0 • Built with Next.js & Tailwind CSS
+  - contentinfo [ref=e68]:
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - link "Eventology" [ref=e72] [cursor=pointer]:
+            - /url: "#home"
+          - paragraph [ref=e73]: The ultimate bridge between ambitious students and world-class events. From learning to leading.
+          - link "Connect with Us" [ref=e74] [cursor=pointer]:
+            - /url: https://linktr.ee/Eventology.Link
+            - text: Connect with Us
+            - img [ref=e75]
+        - generic [ref=e79]:
+          - heading "Company" [level=3] [ref=e80]
+          - list [ref=e81]:
+            - listitem [ref=e82]:
+              - link "About Us" [ref=e83] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e84]:
+              - link "Services" [ref=e85] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e86]:
+              - link "Careers" [ref=e87] [cursor=pointer]:
+                - /url: "#join"
+        - generic [ref=e88]:
+          - heading "Services" [level=3] [ref=e89]
+          - list [ref=e90]:
+            - listitem [ref=e91]: Event Management
+            - listitem [ref=e92]: Web Development
+            - listitem [ref=e93]: Creative Media
+            - listitem [ref=e94]: Logistics & Ushers
+        - generic [ref=e95]:
+          - heading "Contact" [level=3] [ref=e96]
+          - list [ref=e97]:
+            - listitem [ref=e98]:
+              - img [ref=e99]
+              - generic [ref=e102]: ya3777250@gmail.com
+            - listitem [ref=e103]:
+              - img [ref=e104]
+              - generic [ref=e106]: "+201128209072"
+      - paragraph [ref=e108]: © 2025 Eventology. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e114] [cursor=pointer]:
+    - img [ref=e115]
+  - alert [ref=e118]
+```

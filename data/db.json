@@ -1,0 +1,93 @@
+{
+  "users": [],
+  "applications": [
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "1c5c3c4d-aef6-4ae5-ab02-489454963198",
+      "createdAt": "2025-12-29T03:13:09.273Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "f098016a-8836-4b61-b29b-e1c843a8146a",
+      "createdAt": "2025-12-29T03:18:38.153Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "cfc0ce2d-e156-40e9-a83f-9c9156883ce4",
+      "createdAt": "2025-12-29T22:37:33.502Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "0eb617f2-f4b4-4917-87c4-4aadda2e5c78",
+      "createdAt": "2025-12-29T22:38:27.339Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "538af87d-9181-451e-99cf-61e339124864",
+      "createdAt": "2025-12-29T22:39:52.787Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "3df16aef-830b-428e-b902-9941bfdabd54",
+      "createdAt": "2025-12-29T22:40:55.631Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@example.com",
+      "phone": "+1234567890",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "id": "6398d0a6-a677-4ad7-9ebf-19a46f5eacb9",
+      "createdAt": "2025-12-29T22:42:00.667Z",
+      "status": "pending"
+    }
+  ],
+  "inquiries": [],
+  "settings": {
+    "formsEnabled": true
+  }
+}

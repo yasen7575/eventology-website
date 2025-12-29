@@ -16,8 +16,18 @@ export default function JoinUs() {
 
   // Check if forms are enabled
   useEffect(() => {
-    const settings = StorageService.getSettings();
-    setIsEnabled(settings.formsEnabled);
+    const fetchSettings = async () => {
+        try {
+            const settings = await StorageService.getSettings();
+            setIsEnabled(settings.formsEnabled);
+        } catch (error) {
+            console.error("Failed to fetch settings:", error);
+            // Default to disabled if settings can't be fetched
+            setIsEnabled(false);
+        }
+    };
+
+    fetchSettings();
   }, []);
 
   // Form States

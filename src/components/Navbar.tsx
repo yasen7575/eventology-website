@@ -83,6 +83,15 @@ export default function Navbar() {
                         <p className="text-xs text-slate-400">Signed in as</p>
                         <p className="text-sm font-medium truncate">{user.email}</p>
                       </div>
+                      {user.role === "super_admin" && (
+                        <Link
+                          href="/admin"
+                          className="w-full text-left px-4 py-3 text-sm text-blue-400 hover:bg-white/5 flex items-center gap-2 transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          Manage
+                        </Link>
+                      )}
                       <button
                         onClick={() => {
                           logout();

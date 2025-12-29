@@ -1,3 +1,5 @@
+// src/services/storage.ts
+
 export interface Application {
     id: string;
     name: string;
@@ -29,123 +31,83 @@ export interface SystemSettings {
 }
 
 export interface User {
-    id: string;
+    id:string;
     name: string;
     email: string;
-    password?: string; // Only stored in localStorage for this mock implementation
+    password?: string;
     role: "user" | "admin" | "super_admin";
     isVerified: boolean;
+    permissions?: string[];
 }
 
-const STORAGE_KEYS = {
-    USERS: "eventology_users",
-    APPLICATIONS: "eventology_applications",
-    INQUIRIES: "eventology_inquiries",
-    SETTINGS: "eventology_settings"
-};
-
-const SUPER_ADMIN: User = {
-    id: "super_admin_001",
-    name: "System Administrator",
-    email: "ya3777250@gmail.com",
-    role: "super_admin",
-    isVerified: true
-};
-
-const SUPER_ADMIN_PASS = "Ak998877";
+async function api<T>(url: string, options: RequestInit = {}): Promise<T> {
+    const response = await fetch(`/api${url}`, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+    });
+    if (!response.ok) {
+        const error = new Error(`API error: ${response.statusText}`);
+        try {
+            const body = await response.json();
+            (error as any).responseBody = body;
+        } catch (e) {
+            // Ignore if body is not JSON
+        }
+        throw error;
+    }
+    return response.json();
+}
 
 export const StorageService = {
     // --- Users ---
-    getUsers: (): User[] => {
-        if (typeof window === "undefined") return [];
-        const usersStr = localStorage.getItem(STORAGE_KEYS.USERS);
-        return usersStr ? JSON.parse(usersStr) : [];
-    },
+    getUsers: (): Promise<User[]> => api<User[]>('/users'),
 
-    saveUser: (user: User) => {
-        const users = StorageService.getUsers();
-        // Remove existing if any (update)
-        const filtered = users.filter(u => u.id !== user.id && u.email !== user.email);
-        filtered.push(user);
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(filtered));
-    },
+    saveUser: (user: Omit<User, 'id' | 'isVerified' | 'role'>): Promise<User> => api<User>('/users', {
+        method: 'POST',
+        body: JSON.stringify({
+            ...user,
+            id: crypto.randomUUID(),
+            isVerified: false, // Or handle verification flow
+            role: 'user',
+        }),
+    }),
 
-    getUserByEmail: (email: string): User | undefined => {
-        if (email === SUPER_ADMIN.email) return SUPER_ADMIN;
-        const users = StorageService.getUsers();
+    promoteUser: (userId: string): Promise<User> => api<User>(`/users/${userId}/promote`, { method: 'POST' }),
+
+    demoteUser: (userId: string): Promise<User> => api<User>(`/users/${userId}/demote`, { method: 'POST' }),
+
+    getUserByEmail: async (email: string): Promise<User | undefined> => {
+        const users = await StorageService.getUsers();
         return users.find(u => u.email === email);
     },
 
-    // Special Auth Check for Super Admin
-    validateCredentials: (email: string, password: string): User | null => {
-        if (email === SUPER_ADMIN.email && password === SUPER_ADMIN_PASS) {
-            return SUPER_ADMIN;
-        }
-
-        const users = StorageService.getUsers();
-        const user = users.find(u => u.email === email && u.password === password);
-        return user || null;
-    },
-
     // --- Applications ---
-    getApplications: (): Application[] => {
-        if (typeof window === "undefined") return [];
-        const appStr = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
-        return appStr ? JSON.parse(appStr) : [];
-    },
+    getApplications: (): Promise<Application[]> => api<Application[]>('/applications'),
 
-    addApplication: (app: Omit<Application, "id" | "createdAt" | "status">) => {
-        const apps = StorageService.getApplications();
-        const newApp: Application = {
-            ...app,
-            id: crypto.randomUUID(),
-            createdAt: new Date().toISOString(),
-            status: "pending"
-        };
-        apps.push(newApp);
-        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(apps));
-        return newApp;
-    },
+    addApplication: (app: Omit<Application, "id" | "createdAt" | "status">): Promise<Application> => api<Application>('/applications', {
+        method: 'POST',
+        body: JSON.stringify(app),
+    }),
 
     // --- Inquiries ---
-    getInquiries: (): Inquiry[] => {
-        if (typeof window === "undefined") return [];
-        const inqStr = localStorage.getItem(STORAGE_KEYS.INQUIRIES);
-        return inqStr ? JSON.parse(inqStr) : [];
-    },
+    getInquiries: (): Promise<Inquiry[]> => api<Inquiry[]>('/inquiries'),
 
-    addInquiry: (inquiry: Omit<Inquiry, "id" | "createdAt" | "status">) => {
-        const inquiries = StorageService.getInquiries();
-        const newInquiry: Inquiry = {
-            ...inquiry,
-            id: crypto.randomUUID(),
-            createdAt: new Date().toISOString(),
-            status: "new"
-        };
-        inquiries.push(newInquiry);
-        localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify(inquiries));
-        return newInquiry;
-    },
+    addInquiry: (inquiry: Omit<Inquiry, "id" | "createdAt" | "status">): Promise<Inquiry> => api<Inquiry>('/inquiries', {
+        method: 'POST',
+        body: JSON.stringify(inquiry),
+    }),
 
     // --- Settings ---
-    getSettings: (): SystemSettings => {
-        if (typeof window === "undefined") return { formsEnabled: true };
-        const settingsStr = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-        return settingsStr ? JSON.parse(settingsStr) : { formsEnabled: true };
-    },
+    getSettings: (): Promise<SystemSettings> => api<SystemSettings>('/settings'),
 
-    updateSettings: (settings: Partial<SystemSettings>) => {
-        const current = StorageService.getSettings();
-        const updated = { ...current, ...settings };
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updated));
-        return updated;
-    },
+    updateSettings: (settings: Partial<SystemSettings>): Promise<SystemSettings> => api<SystemSettings>('/settings', {
+        method: 'POST',
+        body: JSON.stringify(settings),
+    }),
 
     // --- Utility ---
-    wipeAll: () => {
-        localStorage.removeItem(STORAGE_KEYS.USERS);
-        localStorage.removeItem(STORAGE_KEYS.APPLICATIONS);
-        localStorage.removeItem(STORAGE_KEYS.INQUIRIES);
-        localStorage.removeItem(STORAGE_KEYS.SETTINGS);
-    }
+    wipeAll: (): Promise<void> => api<void>('/wipe', { method: 'POST' }), // Assumes a /api/wipe endpoint
 };

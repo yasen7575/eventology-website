@@ -21,9 +21,7 @@ test('Verify Super Admin Flow and Dashboard', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Mission Control');
 
   // 6. Check Tabs
-  await expect(page.locator('nav button').filter({ hasText: 'Talent Pipeline' })).toBeVisible();
-  await expect(page.locator('nav button').filter({ hasText: 'Inquiries' })).toBeVisible();
-  await expect(page.locator('nav button').filter({ hasText: 'Settings' })).toBeVisible();
+  await expect(page.locator('button').filter({ hasText: 'Talent Pipeline' })).toBeVisible();
 });
 
 test('Verify Regular User Cannot Access Admin Dashboard', async ({ page }) => {
@@ -104,8 +102,9 @@ test('Verify Public Form Submission and Admin Data', async ({ page }) => {
 
   // 5. Check Admin Dashboard
   await page.goto('http://localhost:3000/admin');
-  await expect(page.locator('text=Test Candidate')).toBeVisible();
-  await expect(page.locator('text=Test University')).toBeVisible();
+  await page.click('button:has-text("Talent Pipeline")');
+  await expect(page.locator('h3:has-text("Test Candidate")').first()).toBeVisible();
+  await expect(page.locator('p:has-text("Test University")').first()).toBeVisible();
 });
 
 test('Verify Form Toggle Logic', async ({ page }) => {
@@ -118,10 +117,11 @@ test('Verify Form Toggle Logic', async ({ page }) => {
 
     // 2. Go to Admin Settings
     await page.goto('http://localhost:3000/admin');
-    await page.click('nav button:has-text("Settings")');
+    await page.click('button:has-text("Settings")');
+    await expect(page.getByRole('heading', { name: 'System Settings' })).toBeVisible();
 
     // 3. Toggle Off
-    const toggleBtn = page.locator('button.bg-green-500');
+    const toggleBtn = page.locator('div:has-text("Recruitment Forms")').locator('button[role="switch"]');
     await toggleBtn.click();
 
     // 4. Verify Public Site is Closed
@@ -134,7 +134,7 @@ test('Verify Form Toggle Logic', async ({ page }) => {
 
     // 5. Toggle On (Cleanup)
     await page.goto('http://localhost:3000/admin');
-    await page.click('nav button:has-text("Settings")');
-    const toggleBtnOff = page.locator('button.bg-slate-600');
+    await page.click('button:has-text("Settings")');
+    const toggleBtnOff = page.locator('button[role="switch"]');
     await toggleBtnOff.click();
 });

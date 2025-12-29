@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { StorageService, Application, Inquiry } from "@/services/storage";
+import { User } from "@/services/storage";
 import {
   LayoutDashboard,
   Users,
@@ -22,7 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Tab = "pipeline" | "inquiries" | "settings";
+type Tab = "pipeline" | "inquiries" | "settings" | "users";
 
 export default function AdminDashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -31,6 +32,7 @@ export default function AdminDashboard() {
 
   // Data States
   const [applications, setApplications] = useState<Application[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [formsEnabled, setFormsEnabled] = useState(true);
 
@@ -55,16 +57,33 @@ export default function AdminDashboard() {
     loadData();
   }, [user, isAuthenticated, isLoading, router]);
 
-  const loadData = () => {
-    setApplications(StorageService.getApplications());
-    setInquiries(StorageService.getInquiries());
-    setFormsEnabled(StorageService.getSettings().formsEnabled);
+  const loadData = async () => {
+    const [apps, inqs, settings, users] = await Promise.all([
+      StorageService.getApplications(),
+      StorageService.getInquiries(),
+      StorageService.getSettings(),
+      StorageService.getUsers(),
+    ]);
+    setApplications(apps);
+    setInquiries(inqs);
+    setFormsEnabled(settings.formsEnabled);
+    setUsers(users);
   };
 
-  const toggleForms = () => {
+  const toggleForms = async () => {
     const newState = !formsEnabled;
-    StorageService.updateSettings({ formsEnabled: newState });
+    await StorageService.updateSettings({ formsEnabled: newState });
     setFormsEnabled(newState);
+  };
+
+  const handlePromote = async (userId: string) => {
+    await StorageService.promoteUser(userId);
+    loadData();
+  };
+
+  const handleDemote = async (userId: string) => {
+    await StorageService.demoteUser(userId);
+    loadData();
   };
 
   const filteredApps = applications.filter(app => {
@@ -115,6 +134,12 @@ export default function AdminDashboard() {
             label="Settings"
             active={activeTab === "settings"}
             onClick={() => setActiveTab("settings")}
+          />
+          <SidebarItem
+            icon={<Users size={20} />}
+            label="Users"
+            active={activeTab === "users"}
+            onClick={() => setActiveTab("users")}
           />
         </nav>
 
@@ -251,6 +276,41 @@ export default function AdminDashboard() {
                  </div>
               </div>
            </div>
+        )}
+
+        {activeTab === "users" && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white">User Management</h2>
+            <div className="bg-[#1e293b] rounded-xl border border-white/5 overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-[#0f172a] text-slate-400 uppercase font-medium">
+                  <tr>
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Email</th>
+                    <th className="px-6 py-4">Role</th>
+                    <th className="px-6 py-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {users.map((u) => (
+                    <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 font-medium text-white">{u.name}</td>
+                      <td className="px-6 py-4 text-blue-400">{u.email}</td>
+                      <td className="px-6 py-4">{u.role}</td>
+                      <td className="px-6 py-4">
+                        {u.role === 'user' && (
+                          <button onClick={() => handlePromote(u.id)} className="text-green-400">Promote</button>
+                        )}
+                        {u.role === 'admin' && (
+                          <button onClick={() => handleDemote(u.id)} className="text-red-400">Demote</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </main>
     </div>
