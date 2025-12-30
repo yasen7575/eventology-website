@@ -35,7 +35,7 @@ export default function SignupPage() {
                 setStep("verification");
                 setVerificationMessage("Confirmation code sent to " + result.email);
             }
-        } catch (err) {
+        } catch {
             // Error handled by context
         }
     };
@@ -45,7 +45,7 @@ export default function SignupPage() {
         try {
             await verify(email, otp);
             // On success, AuthContext redirects to home
-        } catch (err) {
+        } catch {
             // Error handled by AuthContext
         }
     };

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, X, Shield, Users, Zap, Star, Layout, UserCog, User } from "lucide-react";
+import { Check, Shield, Users, Star } from "lucide-react";
 
 export default function Services() {
   return (
@@ -49,7 +49,7 @@ export default function Services() {
                 <h3 className="text-3xl font-bold text-white mb-2">The Community</h3>
                 <p className="text-slate-400 text-sm mb-4">Ideally suits student activities & non-profits.</p>
                 <div className="text-2xl font-bold text-white">Free / Low Cost</div>
-                <p className="text-xs text-slate-500 mt-1">Covered by "The Talent Pipeline"</p>
+                <p className="text-xs text-slate-500 mt-1">Covered by &quot;The Talent Pipeline&quot;</p>
               </div>
 
               {/* Execution Specs */}
@@ -105,7 +105,7 @@ export default function Services() {
           >
             {/* "Recommended" Badge */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg z-20">
-              Recommended for Corporate
+              &quot;Recommended for Corporate&quot;
             </div>
 
             <div className="h-full bg-[#0b1121] rounded-[22px] p-8 md:p-10 relative overflow-hidden">
@@ -121,7 +121,7 @@ export default function Services() {
                 <h3 className="text-3xl font-bold text-white mb-2">The Elite</h3>
                 <p className="text-slate-400 text-sm mb-4">For corporate events requiring perfection.</p>
                 <div className="text-2xl font-bold text-white">Premium</div>
-                <p className="text-xs text-slate-500 mt-1">Covered by "The Core Team"</p>
+                <p className="text-xs text-slate-500 mt-1">Covered by &quot;The Core Team&quot;</p>
               </div>
 
               {/* Execution Specs */}

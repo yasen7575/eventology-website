@@ -10,15 +10,7 @@ import {
   MessageSquare,
   Settings,
   Search,
-  Filter,
-  ChevronDown,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Briefcase,
-  GraduationCap,
   Link as LinkIcon,
-  User as UserIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,9 +22,18 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("pipeline");
 
   // Data States
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [formsEnabled, setFormsEnabled] = useState(true);
+  const [applications] = useState<Application[]>(() => {
+    if (typeof window === 'undefined') return [];
+    return StorageService.getApplications();
+    });
+  const [inquiries] = useState<Inquiry[]>(() => {
+    if (typeof window === 'undefined') return [];
+    return StorageService.getInquiries();
+    });
+  const [formsEnabled, setFormsEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    return StorageService.getSettings().formsEnabled;
+    });
 
   // Filters
   const [search, setSearch] = useState("");
@@ -51,15 +52,7 @@ export default function AdminDashboard() {
       router.push("/");
       return;
     }
-
-    loadData();
   }, [user, isAuthenticated, isLoading, router]);
-
-  const loadData = () => {
-    setApplications(StorageService.getApplications());
-    setInquiries(StorageService.getInquiries());
-    setFormsEnabled(StorageService.getSettings().formsEnabled);
-  };
 
   const toggleForms = () => {
     const newState = !formsEnabled;
@@ -337,7 +330,7 @@ function ApplicationCard({ app }: { app: Application }) {
 
          <div className="bg-[#0f172a] p-4 rounded-lg text-sm text-slate-400">
             {app.type === 'beginner' ? (
-                <p className="italic">"{app.motivation}"</p>
+                <p className="italic">&quot;{app.motivation}&quot;</p>
             ) : (
                 <div className="flex items-center gap-2">
                    <LinkIcon size={16} className="text-blue-500" />
