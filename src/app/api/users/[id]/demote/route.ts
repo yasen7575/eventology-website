@@ -15,8 +15,11 @@ function writeDb(data: any): void {
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   const db = readDb();
   const userIndex = db.users.findIndex((u: User) => u.id === id);
 

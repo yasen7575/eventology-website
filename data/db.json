@@ -96,54 +96,6 @@
       "id": "96967b1b-d15c-4d8f-8f13-dedd197c61cf",
       "createdAt": "2025-12-29T22:57:24.878Z",
       "status": "pending"
-    },
-    {
-      "name": "Test Candidate",
-      "email": "test@example.com",
-      "phone": "+1234567890",
-      "type": "beginner",
-      "university": "Test University",
-      "age": "25",
-      "motivation": "I want to learn.",
-      "id": "9b5adfd8-836b-4ad0-843e-cfd8b49db005",
-      "createdAt": "2025-12-30T16:42:38.561Z",
-      "status": "pending"
-    },
-    {
-      "name": "Test Candidate",
-      "email": "test@example.com",
-      "phone": "+1234567890",
-      "type": "beginner",
-      "university": "Test University",
-      "age": "25",
-      "motivation": "I want to learn.",
-      "id": "4b87136b-7f0c-4fc6-bed4-0888e0646284",
-      "createdAt": "2025-12-30T16:44:10.795Z",
-      "status": "pending"
-    },
-    {
-      "name": "Test Candidate",
-      "email": "test@example.com",
-      "phone": "+1234567890",
-      "type": "beginner",
-      "university": "Test University",
-      "age": "25",
-      "motivation": "I want to learn.",
-      "id": "48b70d89-883e-4432-9f2c-393b04d632df",
-      "createdAt": "2025-12-30T16:45:19.987Z",
-      "status": "pending"
-    },
-    {
-      "name": "Test Candidate",
-      "email": "test@example.com",
-      "phone": "+1234567890",
-      "type": "beginner",
-      "university": "Test University",
-      "age": "25",
-      "motivation": "I want to learn.",
-      "id": "e4151c02-2386-4a6f-9b59-aecdfd4ed111",
-      "createdAt": "2025-12-30T16:52:34.394Z",
-      "status": "pending"
     }
   ],
   "inquiries": [],

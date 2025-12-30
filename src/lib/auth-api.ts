@@ -1,6 +1,5 @@
 // src/lib/auth-api.ts
 import { StorageService, User as StorageUser } from "@/services/storage";
-import emailjs from '@emailjs/browser';
 
 // Re-export User type to match what AuthContext expects
 export interface User extends Omit<StorageUser, "password"> {
