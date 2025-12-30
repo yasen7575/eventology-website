@@ -53,8 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 authApi.persistSession(response.user);
                 router.push("/");
             }
-        } catch (err: any) {
-            setError(err.message || "Failed to login");
+        } catch (err) {
+            const error = err as Error;
+            setError(error.message || "Failed to login");
             throw err;
         } finally {
             setIsLoading(false);
@@ -78,8 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 router.push("/");
             }
             return {};
-        } catch (err: any) {
-            setError(err.message || "Failed to register");
+        } catch (err) {
+            const error = err as Error;
+            setError(error.message || "Failed to register");
             throw err;
         } finally {
             setIsLoading(false);
@@ -96,8 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 authApi.persistSession(response.user);
                 router.push("/");
             }
-        } catch (err: any) {
-            setError(err.message || "Verification failed");
+        } catch (err) {
+            const error = err as Error;
+            setError(error.message || "Verification failed");
             throw err;
         } finally {
             setIsLoading(false);

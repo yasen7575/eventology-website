@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/Input";
-import { Loader2, Mail, Lock, ArrowRight, User } from "lucide-react";
+import { Loader2, Lock, ArrowRight, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
@@ -16,7 +16,7 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             await login(identifier, password);
-        } catch (err) {
+        } catch {
             // Error handled by context
         }
     };
@@ -94,7 +94,7 @@ export default function LoginPage() {
 
                     {/* Footer */}
                     <div className="mt-8 text-center text-sm text-slate-400">
-                        Don't have an account?{" "}
+                        Don&apos;t have an account?{" "}
                         <Link
                             href="/signup"
                             className="text-white hover:text-blue-400 font-medium transition-colors"

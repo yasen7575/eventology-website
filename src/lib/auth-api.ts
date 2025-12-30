@@ -17,6 +17,17 @@ export interface AuthResponse {
 const SESSION_KEY = "eventology_session";
 const PENDING_STORAGE_KEY = "eventology_pending_registrations";
 
+// Type for pending registrations
+interface PendingUser {
+    id: string;
+    name: string;
+    email: string;
+    password?: string; // Stored temporarily until verification
+    otp?: string;
+    isVerified: boolean;
+    createdAt: string;
+}
+
 // Helper to delay execution to simulate network latency
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -42,7 +53,8 @@ export const authApi = {
         }
 
         // Create session object (remove password)
-        const { password: _, ...safeUser } = user;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: _password, ...safeUser } = user;
         const authUser: User = safeUser;
 
         // "Token" is just a mock string for now
@@ -103,7 +115,7 @@ export const authApi = {
 
         // Save to PENDING storage
         const pendingStr = localStorage.getItem(PENDING_STORAGE_KEY);
-        let pendingUsers: any[] = pendingStr ? JSON.parse(pendingStr) : [];
+        let pendingUsers: PendingUser[] = pendingStr ? JSON.parse(pendingStr) : [];
 
         // Remove previous attempts for this email
         pendingUsers = pendingUsers.filter(u => u.email !== email);
@@ -124,7 +136,7 @@ export const authApi = {
 
         // Check Pending Storage
         const pendingStr = localStorage.getItem(PENDING_STORAGE_KEY);
-        let pendingUsers: any[] = pendingStr ? JSON.parse(pendingStr) : [];
+        const pendingUsers: PendingUser[] = pendingStr ? JSON.parse(pendingStr) : [];
 
         const pendingIndex = pendingUsers.findIndex(u => u.email === email);
 
@@ -154,7 +166,8 @@ export const authApi = {
         pendingUsers.splice(pendingIndex, 1);
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingUsers));
 
-        const { password: _, ...safeUser } = newUser;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: _password, ...safeUser } = newUser;
         const authUser: User = safeUser;
         const token = "mock-jwt-token-" + Math.random().toString(36).substring(7);
 

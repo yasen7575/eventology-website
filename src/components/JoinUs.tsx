@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,13 +12,17 @@ export default function JoinUs() {
   const [mode, setMode] = useState<FormMode>("beginner");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(true);
-
-  // Check if forms are enabled
-  useEffect(() => {
-    const settings = StorageService.getSettings();
-    setIsEnabled(settings.formsEnabled);
-  }, []);
+  const [isEnabled] = useState(() => {
+    if (typeof window === 'undefined') {
+        return true; // Default for SSR, forms enabled
+    }
+    try {
+        const settings = StorageService.getSettings();
+        return settings.formsEnabled;
+    } catch {
+        return true; // Default if storage fails
+    }
+  });
 
   // Form States
   const [formData, setFormData] = useState({
@@ -90,7 +94,7 @@ export default function JoinUs() {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">Join the Movement</h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg mb-8">
-            Whether you're starting your journey or looking to lead the industry, there's a place for you at Eventology.
+            Whether you&apos;re starting your journey or looking to lead the industry, there&apos;s a place for you at Eventology.
           </p>
 
           {!isEnabled ? (
@@ -158,7 +162,7 @@ export default function JoinUs() {
                           <Check size={40} />
                         </div>
                         <h3 className="text-2xl font-bold mb-2">Application Received!</h3>
-                        <p className="text-slate-400">We'll be in touch shortly to kickstart your journey.</p>
+                        <p className="text-slate-400">We&apos;ll be in touch shortly to kickstart your journey.</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
