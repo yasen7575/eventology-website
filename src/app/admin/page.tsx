@@ -255,6 +255,8 @@ export default function AdminDashboard() {
                     </div>
                     <button
                        onClick={toggleForms}
+                       role="switch"
+                       aria-checked={formsEnabled}
                        className={cn(
                           "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#1e293b]",
                           formsEnabled ? "bg-green-500" : "bg-slate-600"

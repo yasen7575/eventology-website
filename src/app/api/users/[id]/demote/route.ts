@@ -1,5 +1,5 @@
 // src/app/api/users/[id]/demote/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { User } from '@/services/storage';
@@ -15,7 +15,7 @@ function writeDb(data: any): void {
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
   const db = readDb();
   const userIndex = db.users.findIndex((u: User) => u.id === id);
