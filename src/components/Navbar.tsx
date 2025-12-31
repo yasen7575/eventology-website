@@ -170,7 +170,65 @@ export default function Navbar() {
           </button>
         </div>
       </header>
-        {/* ... (mobile menu) */}
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-0 left-0 right-0 pt-24 pb-8 glass-dark md:hidden z-40"
+          >
+            <nav className="container mx-auto px-6 flex flex-col items-center gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-lg font-medium hover:text-blue-400 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <div className="w-full h-[1px] bg-white/10 my-4"></div>
+              {!loading && (user ? (
+                <div className="flex flex-col items-center gap-4 w-full">
+                   <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                      {fullName?.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-medium">{fullName}</span>
+                   </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-center px-6 py-3 text-lg font-medium text-red-400 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-4 w-full">
+                  <Link
+                    href="/login"
+                    className="w-full text-center px-6 py-3 text-lg font-medium hover:text-white text-slate-300 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/#join"
+                    className="w-full text-center px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-shadow"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Join Our Team
+                  </Link>
+                </div>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Tab = "pipeline" | "inquiries" | "users" | "settings";
+type Tab = "pipeline" | "users" | "settings";
 const SUPER_ADMIN_EMAIL = "ya3777250@gmail.com";
 
 interface Profile {
@@ -55,7 +55,6 @@ export default function AdminDashboard() {
   const [appsLoading, setAppsLoading] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
-  const [inquiries] = useState<Inquiry[]>([]);
   const [formsEnabled, setFormsEnabled] = useState<boolean>(true);
   const [settingsSaved, setSettingsSaved] = useState(false);
 
@@ -164,7 +163,6 @@ export default function AdminDashboard() {
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <SidebarItem icon={<Users size={20} />} label="Talent Pipeline" active={activeTab === "pipeline"} onClick={() => setActiveTab("pipeline")} />
-          <SidebarItem icon={<MessageSquare size={20} />} label="Inquiries" active={activeTab === "inquiries"} onClick={() => setActiveTab("inquiries")} badge={inquiries.filter(i => i.status === 'new').length} />
           <SidebarItem icon={<Shield size={20} />} label="Users" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
           <SidebarItem icon={<Settings size={20} />} label="Settings" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
         </nav>
@@ -230,9 +228,6 @@ export default function AdminDashboard() {
                  </table>
              </div>}
          </div>
-        )}
-        {activeTab === "inquiries" && (
-            <div className="text-center py-20 text-slate-500">Inquiries feature coming soon.</div>
         )}
         {activeTab === "settings" && (
            <div className="max-w-2xl">
