@@ -8,7 +8,14 @@ if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ applications: [], users: [], profiles: [] }, null, 2));
 }
 
-const getDb = () => {
+interface MockDb {
+    applications: Record<string, unknown>[];
+    users: Record<string, unknown>[];
+    profiles: Record<string, unknown>[];
+    [key: string]: Record<string, unknown>[];
+}
+
+const getDb = (): MockDb => {
     try {
         const data = fs.readFileSync(DB_PATH, 'utf-8');
         return JSON.parse(data);
@@ -17,18 +24,29 @@ const getDb = () => {
     }
 };
 
-const saveDb = (data: any) => {
+interface QueryBuilder {
+    select: (cols?: string) => QueryBuilder;
+    insert: (row: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
+    update: (newValues: Record<string, unknown>) => QueryBuilder;
+    eq: (col: string, val: unknown) => QueryBuilder;
+    order: (col: string, options: { ascending?: boolean }) => QueryBuilder;
+    single: () => Promise<{ data: Record<string, unknown> | null; error: unknown }>;
+    maybeSingle: () => Promise<{ data: Record<string, unknown> | null; error: unknown }>;
+    then: (resolve: (val: { data: Record<string, unknown>[]; error: unknown }) => void) => void;
+}
+
+const saveDb = (data: MockDb) => {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 };
 
-const createBuilder = (table: string) => {
-    let dataResolver: () => any = () => ({ data: [], error: null });
+const createBuilder = (table: string): QueryBuilder => {
+    let dataResolver: () => { data: Record<string, unknown>[]; error: unknown } = () => ({ data: [], error: null });
     let isInsert = false;
-    let updates: any = null;
+    let updates: Record<string, unknown> | null = null;
 
-    const builder: any = {
-        select: (cols: string = '*') => {
-            if (isInsert || updates) return builder; // Return data from mutation
+    const builder: QueryBuilder = {
+        select: () => {
+            if (isInsert || updates) return builder;
 
             dataResolver = () => {
                 const db = getDb();
@@ -36,38 +54,42 @@ const createBuilder = (table: string) => {
             };
             return builder;
         },
-        insert: (row: any) => {
+        insert: (row: Record<string, unknown> | Record<string, unknown>[]) => {
             isInsert = true;
             dataResolver = () => {
                 const db = getDb();
                 if (!db[table]) db[table] = [];
                 const rows = Array.isArray(row) ? row : [row];
                 // Add simple ID if missing
-                const rowsWithId = rows.map((r: any) => ({ ...r, id: r.id || Date.now().toString(), created_at: new Date().toISOString() }));
+                const rowsWithId = rows.map((r) => ({
+                    ...r,
+                    id: (r.id as string) || Date.now().toString(),
+                    created_at: new Date().toISOString()
+                })) as Record<string, unknown>[];
                 db[table].push(...rowsWithId);
                 saveDb(db);
                 return { data: rowsWithId, error: null };
             };
             return builder;
         },
-        update: (newValues: any) => {
+        update: (newValues: Record<string, unknown>) => {
             updates = newValues;
             return builder;
         },
-        eq: (col: string, val: any) => {
+        eq: (col: string, val: unknown) => {
             const prevResolver = dataResolver;
             dataResolver = () => {
                 // If update, we need to perform the update on filtered rows
                 if (updates) {
                     const db = getDb();
                     const rows = db[table] || [];
-                    const updatedRows: any[] = [];
+                    const updatedRows: Record<string, unknown>[] = [];
 
-                    db[table] = rows.map((r: any) => {
+                    db[table] = rows.map((r) => {
                         if (r[col] === val) {
                             const newRow = { ...r, ...updates };
-                            updatedRows.push(newRow);
-                            return newRow;
+                            updatedRows.push(newRow as Record<string, unknown>);
+                            return newRow as Record<string, unknown>;
                         }
                         return r;
                     });
@@ -78,20 +100,22 @@ const createBuilder = (table: string) => {
                 // Normal select filter
                 const res = prevResolver();
                 if (res.data) {
-                    return { ...res, data: res.data.filter((r: any) => r[col] === val) };
+                    return { ...res, data: res.data.filter((r) => r[col] === val) };
                 }
                 return res;
             };
             return builder;
         },
-        order: (col: string, { ascending }: any) => {
+        order: (col: string, { ascending }: { ascending?: boolean }) => {
             const prevResolver = dataResolver;
             dataResolver = () => {
                 const res = prevResolver();
                 if (res.data && Array.isArray(res.data)) {
-                    res.data.sort((a: any, b: any) => {
-                        if (a[col] < b[col]) return ascending ? -1 : 1;
-                        if (a[col] > b[col]) return ascending ? 1 : -1;
+                    res.data.sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
+                        const aVal = (a[col] as string | number | boolean) ?? '';
+                        const bVal = (b[col] as string | number | boolean) ?? '';
+                        if (aVal < bVal) return (ascending ?? true) ? -1 : 1;
+                        if (aVal > bVal) return (ascending ?? true) ? 1 : -1;
                         return 0;
                     });
                 }
@@ -109,11 +133,11 @@ const createBuilder = (table: string) => {
             if (res.data && res.data.length > 0) return { data: res.data[0], error: null };
             return { data: null, error: null };
         },
-        then: (resolve: any, reject: any) => {
+        then: (resolve) => {
             try {
                 resolve(dataResolver());
             } catch (e) {
-                reject(e);
+                console.error(e);
             }
         }
     };

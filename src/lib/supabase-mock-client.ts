@@ -15,9 +15,6 @@ const saveSession = (session: Session | null) => {
     }
 };
 
-const defaultUser = { id: 'mock-user', email: 'guest@example.com' } as any;
-const defaultSession: Session = { user: defaultUser, access_token: 'mock', refresh_token: 'mock', expires_in: 3600, token_type: 'bearer' };
-
 let currentSession: Session | null = getStoredSession();
 
 export const mockBrowserClient = {
@@ -51,8 +48,8 @@ export const mockBrowserClient = {
     },
     from: (table: string) => {
         return {
-            select: (cols?: string) => ({
-                eq: (col?: string, val?: any) => ({
+            select: () => ({
+                eq: () => ({
                     single: async () => {
                         if (table === 'profiles') return { data: { full_name: 'Mock Admin' }, error: null };
                         return { data: null, error: null };
@@ -60,7 +57,6 @@ export const mockBrowserClient = {
                     maybeSingle: async () => ({ data: null, error: null }),
                 })
             }),
-            insert: async () => ({ data: null, error: null }),
         };
     },
 };

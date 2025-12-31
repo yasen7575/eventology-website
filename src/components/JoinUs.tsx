@@ -2,6 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import JoinUsClient from './JoinUsClient';
 
+export const dynamic = 'force-dynamic';
+
 // This is a Server Component, responsible for fetching initial data securely.
 export default async function JoinUs() {
   const cookieStore = await cookies();

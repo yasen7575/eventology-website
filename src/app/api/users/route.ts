@@ -24,7 +24,7 @@ const createSupabaseAdmin = async () => {
 };
 
 // GET all users
-export async function GET(request: NextRequest) {
+export async function GET() {
   const supabaseAdmin = await createSupabaseAdmin();
   const { data: { user } } = await supabaseAdmin.auth.getUser();
 

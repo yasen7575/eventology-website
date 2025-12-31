@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
-import { Application, Inquiry } from "@/services/storage";
+// import { Application, Inquiry } from "@/services/storage";
 import {
   LayoutDashboard,
   Users,
-  MessageSquare,
   Settings,
-  Search,
   Link as LinkIcon,
   Shield,
   Save,
@@ -60,8 +58,8 @@ export default function AdminDashboard() {
   const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Filters
-  const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<"all" | "beginner" | "expert">("all");
+  const search = "";
+  const filterType = "all";
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {

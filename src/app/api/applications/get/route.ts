@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 const SUPER_ADMIN_EMAIL = "ya3777250@gmail.com";
@@ -23,7 +23,7 @@ const createSupabaseAdmin = async () => {
   );
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const supabaseAdmin = await createSupabaseAdmin();
   const { data: { user } } = await supabaseAdmin.auth.getUser();
 
