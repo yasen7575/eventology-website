@@ -2,22 +2,39 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/Input";
 import { Loader2, Lock, ArrowRight, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
-    const { login, isLoading, error } = useAuth();
-    const [identifier, setIdentifier] = useState("");
+    const router = useRouter();
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError(null);
+
         try {
-            await login(identifier, password);
-        } catch {
-            // Error handled by context
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            router.push("/"); // Redirect to home on successful login
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -47,12 +64,12 @@ export default function LoginPage() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <Input
-                            label="Username or Email"
-                            type="text"
-                            placeholder="john or john@example.com"
+                            label="Email"
+                            type="email"
+                            placeholder="you@example.com"
                             icon={<User size={18} />}
-                            value={identifier}
-                            onChange={(e) => setIdentifier(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
 

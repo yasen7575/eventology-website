@@ -2,23 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/Input";
-import { Loader2, Mail, Lock, User, ArrowRight, CheckCircle } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function SignupPage() {
-    const { register, verify, isLoading, error, clearError } = useAuth();
-
-    // Form States
-    const [step, setStep] = useState<"signup" | "verification">("signup");
+    const router = useRouter();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passError, setPassError] = useState("");
-    const [otp, setOtp] = useState("");
-    const [verificationMessage, setVerificationMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,26 +27,31 @@ export default function SignupPage() {
             return;
         }
         setPassError("");
-        clearError();
+        setError(null);
+        setIsLoading(true);
+        setMessage(null);
 
         try {
-            const result = await register(name, email, password);
-            if (result.requiresVerification) {
-                setStep("verification");
-                setVerificationMessage("Confirmation code sent to " + result.email);
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: name,
+                    },
+                },
+            });
+
+            if (error) {
+                throw error;
             }
-        } catch {
-            // Error handled by context
-        }
-    };
 
-    const handleVerification = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            await verify(email, otp);
-            // On success, AuthContext redirects to home
-        } catch {
-            // Error handled by AuthContext
+            setMessage("Account created! Please check your email to verify your account.");
+
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -66,138 +71,101 @@ export default function SignupPage() {
                     {/* Header */}
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500 mb-2">
-                            {step === "signup" ? "Create Account" : "Verify Email"}
+                            Create Account
                         </h1>
                         <p className="text-slate-400 text-sm">
-                            {step === "signup"
-                                ? "Join the elite event organizing community"
-                                : verificationMessage || "Enter the code sent to your email"}
+                            Join the elite event organizing community
                         </p>
                     </div>
 
-                    {/* Verification Form */}
-                    {step === "verification" && (
-                        <form onSubmit={handleVerification} className="space-y-5">
-                            <Input
-                                label="One-Time Password (OTP)"
-                                type="text"
-                                placeholder="123456"
-                                icon={<CheckCircle size={18} />}
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                required
-                                maxLength={6}
-                                className="tracking-widest text-lg text-center"
-                            />
+                    <form onSubmit={handleSignup} className="space-y-5">
+                        <Input
+                            label="Full Name"
+                            type="text"
+                            placeholder="John Doe"
+                            icon={<User size={18} />}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
 
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
+                        <Input
+                            label="Email Address"
+                            type="email"
+                            placeholder="name@example.com"
+                            icon={<Mail size={18} />}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+
+                        <Input
+                            label="Password"
+                            type="password"
+                            placeholder="••••••••"
+                            icon={<Lock size={18} />}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+
+                        <Input
+                            label="Confirm Password"
+                            type="password"
+                            placeholder="••••••••"
+                            icon={<Lock size={18} />}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            error={passError}
+                            required
+                        />
+
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
                             >
-                                {isLoading ? (
-                                    <Loader2 className="animate-spin" size={20} />
-                                ) : (
-                                    <>
-                                        Verify & Login
-                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
+                                {error}
+                            </motion.div>
+                        )}
 
-                            <button
-                                type="button"
-                                onClick={() => setStep("signup")}
-                                className="w-full text-sm text-slate-400 hover:text-white mt-4 transition-colors"
+                        {message && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm text-center"
                             >
-                                Start Over
-                            </button>
-                        </form>
-                    )}
+                                {message}
+                            </motion.div>
+                        )}
 
-                    {/* Signup Form */}
-                    {step === "signup" && (
-                        <form onSubmit={handleSignup} className="space-y-5">
-                            <Input
-                                label="Full Name"
-                                type="text"
-                                placeholder="John Doe"
-                                icon={<User size={18} />}
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                            />
-
-                            <Input
-                                label="Email Address"
-                                type="email"
-                                placeholder="name@example.com"
-                                icon={<Mail size={18} />}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-
-                            <Input
-                                label="Password"
-                                type="password"
-                                placeholder="••••••••"
-                                icon={<Lock size={18} />}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-
-                            <Input
-                                label="Confirm Password"
-                                type="password"
-                                placeholder="••••••••"
-                                icon={<Lock size={18} />}
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                error={passError}
-                                required
-                            />
-
-                            {error && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
-                                >
-                                    {error}
-                                </motion.div>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-[0_0_20px_rgba(147,51,234,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? (
+                                <Loader2 className="animate-spin" size={20} />
+                            ) : (
+                                <>
+                                    Get Started
+                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                </>
                             )}
-
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-[0_0_20px_rgba(147,51,234,0.5)] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? (
-                                    <Loader2 className="animate-spin" size={20} />
-                                ) : (
-                                    <>
-                                        Get Started
-                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
-                        </form>
-                    )}
+                        </button>
+                    </form>
 
                     {/* Footer */}
-                    {step === "signup" && (
-                        <div className="mt-8 text-center text-sm text-slate-400">
-                            Already have an account?{" "}
-                            <Link
-                                href="/login"
-                                className="text-white hover:text-purple-400 font-medium transition-colors"
-                            >
-                                Sign In
-                            </Link>
-                        </div>
-                    )}
+                    <div className="mt-8 text-center text-sm text-slate-400">
+                        Already have an account?{" "}
+                        <Link
+                            href="/login"
+                            className="text-white hover:text-purple-400 font-medium transition-colors"
+                        >
+                            Sign In
+                        </Link>
+                    </div>
                 </div>
             </motion.div>
         </div>
