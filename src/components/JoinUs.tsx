@@ -6,17 +6,25 @@ import JoinUsClient from './JoinUsClient';
 export default async function JoinUs() {
   const cookieStore = await cookies();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+  let supabase;
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'mock-anon-key') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { mockServerClient } = require('@/lib/supabase-mock-server');
+    supabase = mockServerClient;
+  } else {
+    supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
         },
-      },
-    }
-  );
+      }
+    );
+  }
 
   let isEnabled = true;
   try {

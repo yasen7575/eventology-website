@@ -22,7 +22,7 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -31,7 +31,11 @@ export default function LoginPage() {
                 throw error;
             }
 
-            router.push("/"); // Redirect to home on successful login
+            if (data.session?.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+                router.push("/admin");
+            } else {
+                router.push("/");
+            }
         } catch (err) {
             setError((err as Error).message);
         } finally {

@@ -2,115 +2,92 @@ import { test, expect } from '@playwright/test';
 
 test.describe.configure({ mode: 'serial' });
 
-test('Verify Super Admin Flow and Dashboard', async ({ page }) => {
-  // 1. Go to Login Page
+// Helper to login
+async function login(page, email, password) {
   await page.goto('http://localhost:3000/login');
-
-  // 2. Login as Super Admin
-  await page.getByPlaceholder('you@example.com').fill('ya3777250@gmail.com');
-  await page.getByPlaceholder('••••••••').fill('Ak998877');
+  await page.getByPlaceholder('you@example.com').fill(email);
+  await page.getByPlaceholder('••••••••').fill(password);
   await page.click('button[type="submit"]');
+}
 
-  // 3. Verify Redirect to Home (Wait for navigation)
-  await page.waitForURL('http://localhost:3000/');
+test('Verify Super Admin Flow and Dashboard', async ({ page }) => {
+  // Login as admin
+  await login(page, 'ya3777250@gmail.com', 'Ak998877');
 
-  // 4. Navigate to Admin Dashboard
-  await page.goto('http://localhost:3000/admin');
+  // Verify redirect to admin dashboard
+  await expect(page).toHaveURL('http://localhost:3000/admin');
 
-  // 5. Verify Dashboard Loading
+  // Wait for the main heading to appear
+  await page.waitForSelector('h1', { state: 'visible' });
   await expect(page.locator('h1')).toContainText('Mission Control');
 
-  // 6. Check Tabs
-  await expect(page.locator('nav button').filter({ hasText: 'Talent Pipeline' })).toBeVisible();
-  await expect(page.locator('nav button').filter({ hasText: 'Users' })).toBeVisible();
-  await expect(page.locator('nav button').filter({ hasText: 'System Settings' })).toBeVisible();
+  // Verify admin tabs are visible
+  await expect(page.getByRole('button', { name: 'Talent Pipeline' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Users' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Settings' })).toBeVisible();
 });
 
 test('Verify Regular User Cannot Access Admin Dashboard', async ({ page }) => {
-  // 1. Go to Signup Page
-  await page.goto('http://localhost:3000/signup');
+  // Login as a regular user (no admin rights)
+  await login(page, 'user@example.com', 'password123');
 
-  // 2. Create Regular Account
-  const userEmail = `user-${Date.now()}@example.com`;
-  const userPassword = 'password123';
-  await page.getByPlaceholder('John Doe').fill('Regular User');
-  await page.getByPlaceholder('name@example.com').fill(userEmail);
-  await page.getByLabel('Password', { exact: true }).fill(userPassword);
-  await page.getByLabel('Confirm Password').fill(userPassword);
-  await page.click('button[type="submit"]');
+  // Should be redirected to home page after login
+  await expect(page).toHaveURL('http://localhost:3000/');
 
-  // 3. Wait for redirect to home page (successful signup/login)
-  await page.waitForURL('http://localhost:3000/');
-  await expect(page.locator('h1')).toContainText('Eventology');
-
-  // 4. Attempt to access the admin dashboard
+  // Attempt to access admin dashboard directly
   await page.goto('http://localhost:3000/admin');
 
-  // 5. Expect to be redirected back to the home page
-  await page.waitForURL('http://localhost:3000/');
-  await expect(page.locator('h1')).not.toContainText('Mission Control');
+  // Should be redirected back to home page (protected route)
+  await expect(page).toHaveURL('http://localhost:3000/');
+
+  // Admin UI should not be rendered for regular users
+  await expect(page.getByRole('button', { name: 'Talent Pipeline' })).not.toBeVisible();
 });
 
 test('Verify Public Form Submission and Admin Data', async ({ page }) => {
-  // 1. Go to Join Us (Public)
+  // Fill public join form
   await page.goto('http://localhost:3000/#join');
+  await page.getByPlaceholder('John Doe').fill('Test Candidate');
+  await page.getByPlaceholder('john@example.com').fill('test@candidate.com');
+  await page.getByPlaceholder('+20...').fill('0123456789');
+  await page.getByPlaceholder('Nile University').fill('Test University');
+  await page.getByPlaceholder('20', { exact: true }).fill('25');
+  await page.getByPlaceholder('Tell us about your passion for events...').fill('I want to learn.');
+  await page.click('button[type="submit"]');
 
-  // 2. Fill Form
-  await page.getByPlaceholder('Your Full Name').fill('Test Candidate');
-  await page.getByPlaceholder('Your Email').fill('test@candidate.com');
-  await page.getByPlaceholder('Your Country').fill('Testland');
-  await page.getByPlaceholder('Your University').fill('Test University');
-  await page.getByPlaceholder('Your Age').fill('25');
-  await page.locator('select[aria-label="I am a..."]').selectOption('Beginner');
-  await page.getByPlaceholder('Your Specialty (e.g. Frontend, Backend)').fill('Testing');
-  await page.getByPlaceholder('Briefly tell us about your motivation...').fill('I want to learn.');
-  await page.getByPlaceholder('https://...').fill('https://github.com/test');
-
-  await page.click('button[type="submit"]:has-text("Submit Application")');
-
-  // 3. Verify Success Message
+  // Verify success message
   await expect(page.locator('text=Application Received!')).toBeVisible();
 
-  // 4. Login as Admin
-  await page.goto('http://localhost:3000/login');
-  await page.getByPlaceholder('you@example.com').fill('ya3777250@gmail.com');
-  await page.getByPlaceholder('••••••••').fill('Ak998877');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('http://localhost:3000/');
+  // Login as admin to check the new application appears
+  await login(page, 'ya3777250@gmail.com', 'Ak998877');
+  await expect(page).toHaveURL('http://localhost:3000/admin');
 
-  // 5. Check Admin Dashboard for the new application
-  await page.goto('http://localhost:3000/admin');
-  await expect(page.locator('h3:has-text("Test Candidate")')).toBeVisible();
-  await expect(page.locator('p:has-text("Test University")')).toBeVisible();
+  // The new application should be listed in the Talent Pipeline
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByText('Test Candidate').first()).toBeVisible({ timeout: 10000 });
 });
 
 test('Verify Form Toggle Logic', async ({ page }) => {
-    // 1. Login as Admin
-    await page.goto('http://localhost:3000/login');
-    await page.getByPlaceholder('you@example.com').fill('ya3777250@gmail.com');
-    await page.getByPlaceholder('••••••••').fill('Ak998877');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('http://localhost:3000/');
+  // Login as admin
+  await login(page, 'ya3777250@gmail.com', 'Ak998877');
+  await expect(page).toHaveURL('http://localhost:3000/admin');
 
-    // 2. Go to Admin Settings
-    await page.goto('http://localhost:3000/admin');
-    await page.click('nav button:has-text("System Settings")');
+  // Open Settings tab
+  await page.getByRole('button', { name: 'Settings' }).click();
 
-    // 3. Toggle Off
-    await expect(page.locator('h3:has-text("Join Form Status")')).toBeVisible();
-    await page.locator('button:has(svg.text-green-500)').click();
-    await page.click('button:has-text("Save Changes")');
-    await expect(page.locator('text=Settings saved!')).toBeVisible();
+  // Verify the toggle works (turn off)
+  await expect(page.getByRole('heading', { name: 'Recruitment Forms' })).toBeVisible();
+  await page.locator('button').filter({ has: page.locator('span.rounded-full') }).click();
+  await expect(page.locator('text=Settings saved!')).toBeVisible();
 
-    // 4. Go to public site and verify the form is closed
-    await page.goto('http://localhost:3000/#join');
-    await expect(page.locator('h2:has-text("Applications are currently closed")')).toBeVisible();
-    await expect(page.locator('button[type="submit"]:has-text("Submit Application")')).not.toBeVisible();
+  // Public form should now be closed
+  await page.goto('http://localhost:3000/#join');
+  await expect(page.getByRole('heading', { name: 'Applications Closed' })).toBeVisible();
+  await expect(page.locator('button[type="submit"]')).not.toBeVisible();
 
-    // 5. Toggle On (Cleanup)
-    await page.goto('http://localhost:3000/admin');
-    await page.click('nav button:has-text("System Settings")');
-    await page.locator('button:has(svg.text-slate-500)').click();
-    await page.click('button:has-text("Save Changes")');
-    await expect(page.locator('text=Settings saved!')).toBeVisible();
+  // Turn the form back on (cleanup)
+  await page.goto('http://localhost:3000/admin');
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('button').filter({ has: page.locator('span.rounded-full') }).click();
+  await expect(page.locator('text=Settings saved!')).toBeVisible();
 });

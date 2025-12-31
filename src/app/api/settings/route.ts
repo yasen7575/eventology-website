@@ -5,6 +5,10 @@ import { cookies } from 'next/headers';
 const SUPER_ADMIN_EMAIL = "ya3777250@gmail.com";
 
 const createSupabaseAdmin = async () => {
+  if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'mock-anon-key') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require('@/lib/supabase-mock-server').mockServerClient;
+  }
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,4 +48,19 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
+}
+
+export async function GET() {
+  const supabaseAdmin = await createSupabaseAdmin();
+  const { data, error } = await supabaseAdmin
+    .from('settings')
+    .select('value')
+    .eq('key', 'join_form_locked')
+    .single();
+
+  if (error) {
+    return NextResponse.json({ join_form_locked: false });
+  }
+
+  return NextResponse.json({ join_form_locked: data.value });
 }

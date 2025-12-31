@@ -59,9 +59,14 @@ export default function JoinUsClient({ isEnabled }: JoinUsClientProps) {
         body: JSON.stringify(applicationData),
       });
 
+      console.log('JoinUsClient: response status', response.status);
+
       if (!response.ok) {
         throw new Error('Failed to submit application');
       }
+
+      const result = await response.json();
+      console.log('JoinUsClient: success', result);
 
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -98,17 +103,17 @@ export default function JoinUsClient({ isEnabled }: JoinUsClientProps) {
           </p>
 
           {!isEnabled ? (
-             <div className="max-w-xl mx-auto mt-12">
-                <div className="glass-card p-12 rounded-3xl text-center border border-white/10 bg-slate-900/50">
-                    <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
-                        <Lock size={32} />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Applications Closed</h3>
-                    <p className="text-slate-400">
-                        We are currently not accepting new applications. Please check back later or follow our social media for updates.
-                    </p>
+            <div className="max-w-xl mx-auto mt-12">
+              <div className="glass-card p-12 rounded-3xl text-center border border-white/10 bg-slate-900/50">
+                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
+                  <Lock size={32} />
                 </div>
-             </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Applications Closed</h3>
+                <p className="text-slate-400">
+                  We are currently not accepting new applications. Please check back later or follow our social media for updates.
+                </p>
+              </div>
+            </div>
           ) : (
             <>
               {/* Toggle Switch */}

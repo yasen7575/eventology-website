@@ -29,19 +29,19 @@ interface Profile {
 }
 
 interface SupabaseApplication {
-    id: number;
-    created_at: string;
-    name: string;
-    email: string;
-    phone: string;
-    type: "beginner" | "expert";
-    university?: string;
-    age?: string;
-    motivation?: string;
-    specialty?: string;
-    portfolio?: string;
-    experience?: string;
-    status: "pending" | "reviewed" | "accepted" | "rejected";
+  id: number;
+  created_at: string;
+  name: string;
+  email: string;
+  phone: string;
+  type: "beginner" | "expert";
+  university?: string;
+  age?: string;
+  motivation?: string;
+  specialty?: string;
+  portfolio?: string;
+  experience?: string;
+  status?: "pending" | "reviewed" | "accepted" | "rejected";
 }
 
 
@@ -65,11 +65,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('AdminDashboard: onAuthStateChange', event, session?.user?.email);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       setLoading(false);
 
       if (!currentUser || currentUser.email !== SUPER_ADMIN_EMAIL) {
+        console.log('AdminDashboard: Redirecting to /', currentUser?.email);
         router.push("/");
       }
     });
@@ -79,7 +81,7 @@ export default function AdminDashboard() {
     };
   }, [router]);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchTabData = async () => {
       if (activeTab === 'pipeline') {
         setAppsLoading(true);
@@ -103,6 +105,19 @@ export default function AdminDashboard() {
     };
     fetchTabData();
   }, [activeTab]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+          const data = await response.json();
+          setFormsEnabled(!data.join_form_locked);
+        }
+      } catch (error) { console.error(error); }
+    };
+    fetchSettings();
+  }, []);
 
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -130,17 +145,18 @@ export default function AdminDashboard() {
 
   const saveRoleChange = async (userId: string, newRole: string) => {
     try {
-        await fetch(`/api/users`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, role: newRole }),
-        });
+      await fetch(`/api/users`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, role: newRole }),
+      });
     } catch (error) { console.error(error); }
   };
 
   const filteredApps = applications.filter(app => {
+    if (!app || !app.name || !app.email) return false;
     const matchesSearch = app.name.toLowerCase().includes(search.toLowerCase()) ||
-                          app.email.toLowerCase().includes(search.toLowerCase());
+      app.email.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === "all" || app.type === filterType;
     return matchesSearch && matchesType;
   });
@@ -148,7 +164,7 @@ export default function AdminDashboard() {
   if (loading || !user || user.email !== SUPER_ADMIN_EMAIL) {
     return (
       <div className="min-h-screen bg-[#0b1120] flex items-center justify-center">
-        <div className="animate-spin text-blue-500"><LayoutDashboard size={40} /></div>
+        <div className="animate-spin text-blue-500" id="admin-spinner"><LayoutDashboard size={40} /></div>
       </div>
     );
   }
@@ -170,11 +186,11 @@ export default function AdminDashboard() {
         <div className="p-4 border-t border-white/5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500 font-bold">
-               {user?.email?.charAt(0).toUpperCase()}
+              {user?.email?.charAt(0).toUpperCase()}
             </div>
             <div>
-               <p className="text-sm font-medium text-white">Super Admin</p>
-               <p className="text-xs text-slate-500">{user?.email}</p>
+              <p className="text-sm font-medium text-white">Super Admin</p>
+              <p className="text-xs text-slate-500">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -188,76 +204,76 @@ export default function AdminDashboard() {
               {/* Search and filter UI remains the same */}
             </div>
             {appsLoading ? <div className="text-center py-20">Loading...</div> :
-            <div className="grid grid-cols-1 gap-4">
-              {filteredApps.length === 0 ? <div className="text-center py-20 text-slate-500">No applications found.</div> :
-                filteredApps.map(app => <ApplicationCard key={app.id} app={app} />)
-              }
-            </div>}
+              <div className="grid grid-cols-1 gap-4">
+                {filteredApps.length === 0 ? <div className="text-center py-20 text-slate-500">No applications found.</div> :
+                  filteredApps.map(app => <ApplicationCard key={app.id} app={app} />)
+                }
+              </div>}
           </div>
         )}
         {activeTab === "users" && (
-             <div className="space-y-6">
-             <h2 className="text-2xl font-bold text-white">User Management</h2>
-             {usersLoading ? <div className="text-center py-20">Loading...</div> :
-             <div className="bg-[#1e293b] rounded-xl border border-white/5 overflow-hidden">
-                 <table className="w-full text-sm text-left">
-                     <thead className="bg-[#0f172a] text-slate-400 uppercase font-medium">
-                         <tr>
-                             <th className="px-6 py-4">User</th>
-                             <th className="px-6 py-4">Role</th>
-                             <th className="px-6 py-4">Actions</th>
-                         </tr>
-                     </thead>
-                     <tbody className="divide-y divide-white/5">
-                         {profiles.map(p => (
-                             <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                                 <td className="px-6 py-4 font-medium text-white">{p.full_name || p.email}</td>
-                                 <td className="px-6 py-4">
-                                     <select value={p.role} onChange={(e) => handleRoleChange(p.id, e.target.value)} className="bg-slate-700 rounded p-1">
-                                         <option value="user">User</option>
-                                         <option value="admin">Admin</option>
-                                     </select>
-                                 </td>
-                                 <td className="px-6 py-4">
-                                     <button onClick={() => saveRoleChange(p.id, p.role)} className="flex items-center gap-2 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                         <Save size={14} /> Save
-                                     </button>
-                                 </td>
-                             </tr>
-                         ))}
-                     </tbody>
-                 </table>
-             </div>}
-         </div>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white">User Management</h2>
+            {usersLoading ? <div className="text-center py-20">Loading...</div> :
+              <div className="bg-[#1e293b] rounded-xl border border-white/5 overflow-hidden">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-[#0f172a] text-slate-400 uppercase font-medium">
+                    <tr>
+                      <th className="px-6 py-4">User</th>
+                      <th className="px-6 py-4">Role</th>
+                      <th className="px-6 py-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {profiles.map(p => (
+                      <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-6 py-4 font-medium text-white">{p.full_name || p.email}</td>
+                        <td className="px-6 py-4">
+                          <select value={p.role} onChange={(e) => handleRoleChange(p.id, e.target.value)} className="bg-slate-700 rounded p-1">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        </td>
+                        <td className="px-6 py-4">
+                          <button onClick={() => saveRoleChange(p.id, p.role)} className="flex items-center gap-2 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                            <Save size={14} /> Save
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>}
+          </div>
         )}
         {activeTab === "settings" && (
-           <div className="max-w-2xl">
-              <h2 className="text-2xl font-bold text-white mb-6">System Settings</h2>
-              <div className="bg-[#1e293b] p-6 rounded-xl border border-white/5 space-y-6">
-                 <div className="flex items-center justify-between">
-                    <div>
-                       <h3 className="font-bold text-white mb-1">Recruitment Forms</h3>
-                       <p className="text-sm text-slate-400">Enable or disable public access to the Join Us application forms.</p>
-                    </div>
-                    <button
-                       onClick={toggleForms}
-                       className={cn(
-                          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#1e293b]",
-                          formsEnabled ? "bg-green-500" : "bg-slate-600"
-                       )}
-                       disabled={isUpdating}
-                    >
-                       <span
-                          className={cn(
-                             "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                             formsEnabled ? "translate-x-6" : "translate-x-1"
-                          )}
-                       />
-                    </button>
-                 </div>
-                 {settingsSaved && <p className="text-green-400 text-sm">Settings saved!</p>}
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-bold text-white mb-6">System Settings</h2>
+            <div className="bg-[#1e293b] p-6 rounded-xl border border-white/5 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-white mb-1">Recruitment Forms</h3>
+                  <p className="text-sm text-slate-400">Enable or disable public access to the Join Us application forms.</p>
+                </div>
+                <button
+                  onClick={toggleForms}
+                  className={cn(
+                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#1e293b]",
+                    formsEnabled ? "bg-green-500" : "bg-slate-600"
+                  )}
+                  disabled={isUpdating}
+                >
+                  <span
+                    className={cn(
+                      "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                      formsEnabled ? "translate-x-6" : "translate-x-1"
+                    )}
+                  />
+                </button>
               </div>
-           </div>
+              {settingsSaved && <p className="text-green-400 text-sm">Settings saved!</p>}
+            </div>
+          </div>
         )}
       </main>
     </div>
@@ -268,6 +284,7 @@ function SidebarItem({ icon, label, active, onClick, badge }: { icon: React.Reac
   return (
     <button
       onClick={onClick}
+      aria-label={label}
       className={cn(
         "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
         active ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20" : "text-slate-400 hover:bg-white/5 hover:text-white"
@@ -278,64 +295,64 @@ function SidebarItem({ icon, label, active, onClick, badge }: { icon: React.Reac
         <span className="font-medium text-sm">{label}</span>
       </div>
       {badge ? (
-         <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{badge}</span>
+        <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{badge}</span>
       ) : null}
     </button>
   );
 }
 
 function ApplicationCard({ app }: { app: SupabaseApplication }) {
-   return (
-      <div className="bg-[#1e293b] p-6 rounded-xl border border-white/5 hover:border-blue-500/30 transition-all group">
-         <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-3">
-               <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg", app.type === 'expert' ? "bg-purple-500/20 text-purple-400" : "bg-blue-500/20 text-blue-400")}>
-                  {app.name.charAt(0)}
-               </div>
-               <div>
-                  <h3 className="font-bold text-white">{app.name}</h3>
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                     <span className={cn("px-2 py-0.5 rounded-full font-medium", app.type === 'expert' ? "bg-purple-500/10 text-purple-400" : "bg-blue-500/10 text-blue-400")}>
-                        {app.type.toUpperCase()}
-                     </span>
-                     <span>•</span>
-                     <span>{new Date(app.created_at).toLocaleDateString()}</span>
-                  </div>
-               </div>
+  return (
+    <div className="bg-[#1e293b] p-6 rounded-xl border border-white/5 hover:border-blue-500/30 transition-all group">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center gap-3">
+          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg", app.type === 'expert' ? "bg-purple-500/20 text-purple-400" : "bg-blue-500/20 text-blue-400")}>
+            {app.name.charAt(0)}
+          </div>
+          <div>
+            <h3 className="font-bold text-white">{app.name}</h3>
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className={cn("px-2 py-0.5 rounded-full font-medium", app.type === 'expert' ? "bg-purple-500/10 text-purple-400" : "bg-blue-500/10 text-blue-400")}>
+                {app.type.toUpperCase()}
+              </span>
+              <span>•</span>
+              <span>{new Date(app.created_at).toLocaleDateString()}</span>
             </div>
-         </div>
-         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-            <div>
-                <span className="text-xs text-slate-500">Email</span>
-                <p className="text-white font-medium">{app.email}</p>
-            </div>
-            <div>
-                <span className="text-xs text-slate-500">Phone</span>
-                <p className="text-white font-medium">{app.phone}</p>
-            </div>
-            <div>
-                <span className="text-xs text-slate-500">University</span>
-                <p className="text-white font-medium">{app.university || 'N/A'}</p>
-            </div>
-            <div>
-                <span className="text-xs text-slate-500">Age</span>
-                <p className="text-white font-medium">{app.age || 'N/A'}</p>
-            </div>
-             <div>
-                <span className="text-xs text-slate-500">Specialty</span>
-                <p className="text-white font-medium">{app.specialty || 'N/A'}</p>
-            </div>
-            {app.portfolio && <div>
-                <span className="text-xs text-slate-500">Portfolio</span>
-                <a href={app.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
-                    View Portfolio <LinkIcon size={12} />
-                </a>
-            </div>}
-         </div>
-         <div>
-            <span className="text-xs text-slate-500">Motivation</span>
-            <p className="text-white text-sm bg-black/20 p-3 rounded-lg mt-1">{app.motivation || 'No motivation provided.'}</p>
-         </div>
+          </div>
+        </div>
       </div>
-   );
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+        <div>
+          <span className="text-xs text-slate-500">Email</span>
+          <p className="text-white font-medium">{app.email}</p>
+        </div>
+        <div>
+          <span className="text-xs text-slate-500">Phone</span>
+          <p className="text-white font-medium">{app.phone}</p>
+        </div>
+        <div>
+          <span className="text-xs text-slate-500">University</span>
+          <p className="text-white font-medium">{app.university || 'N/A'}</p>
+        </div>
+        <div>
+          <span className="text-xs text-slate-500">Age</span>
+          <p className="text-white font-medium">{app.age || 'N/A'}</p>
+        </div>
+        <div>
+          <span className="text-xs text-slate-500">Specialty</span>
+          <p className="text-white font-medium">{app.specialty || 'N/A'}</p>
+        </div>
+        {app.portfolio && <div>
+          <span className="text-xs text-slate-500">Portfolio</span>
+          <a href={app.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
+            View Portfolio <LinkIcon size={12} />
+          </a>
+        </div>}
+      </div>
+      <div>
+        <span className="text-xs text-slate-500">Motivation</span>
+        <p className="text-white text-sm bg-black/20 p-3 rounded-lg mt-1">{app.motivation || 'No motivation provided.'}</p>
+      </div>
+    </div>
+  );
 }
