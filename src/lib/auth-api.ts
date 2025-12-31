@@ -1,5 +1,4 @@
 import { StorageService, User as StorageUser } from "@/services/storage";
-import emailjs from '@emailjs/browser';
 
 // Re-export User type to match what AuthContext expects
 export interface User extends Omit<StorageUser, "password"> {
@@ -84,23 +83,8 @@ export const authApi = {
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Send OTP via EmailJS
-        try {
-            await emailjs.send(
-                "service_eprnvim",
-                "template_wr5ios5",
-                {
-                    otp: otp,
-                    user_email: email
-                },
-                "ivm-LYIlxfzPm0nFk"
-            );
-        } catch (error) {
-            console.error("EmailJS Error:", error);
-            // Allow registration to proceed in dev even if email fails?
-            // For strict requirement, we throw. But maybe we should log it.
-            throw new Error("Failed to send verification email. Please try again.");
-        }
+        // For now, we'll just log the OTP to the console for development purposes.
+        console.log(`OTP for ${email}: ${otp}`);
 
         // Create new Pending Registration
         const pendingUser = {
