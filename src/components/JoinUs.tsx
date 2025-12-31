@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Loader2, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,17 +12,16 @@ export default function JoinUs() {
   const [mode, setMode] = useState<FormMode>("beginner");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isEnabled] = useState(() => {
-    if (typeof window === 'undefined') {
-        return true; // Default for SSR, forms enabled
-    }
+  const [isEnabled, setIsEnabled] = useState(true);
+
+  useEffect(() => {
     try {
-        const settings = StorageService.getSettings();
-        return settings.formsEnabled;
-    } catch {
-        return true; // Default if storage fails
+      const settings = StorageService.getSettings();
+      setIsEnabled(settings.formsEnabled);
+    } catch (error) {
+      console.error("Failed to load settings", error);
     }
-  });
+  }, []);
 
   // Form States
   const [formData, setFormData] = useState({
@@ -98,17 +97,17 @@ export default function JoinUs() {
           </p>
 
           {!isEnabled ? (
-             <div className="max-w-xl mx-auto mt-12">
-                <div className="glass-card p-12 rounded-3xl text-center border border-white/10 bg-slate-900/50">
-                    <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
-                        <Lock size={32} />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Applications Closed</h3>
-                    <p className="text-slate-400">
-                        We are currently not accepting new applications. Please check back later or follow our social media for updates.
-                    </p>
+            <div className="max-w-xl mx-auto mt-12">
+              <div className="glass-card p-12 rounded-3xl text-center border border-white/10 bg-slate-900/50">
+                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
+                  <Lock size={32} />
                 </div>
-             </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Applications Closed</h3>
+                <p className="text-slate-400">
+                  We are currently not accepting new applications. Please check back later or follow our social media for updates.
+                </p>
+              </div>
+            </div>
           ) : (
             <>
               {/* Toggle Switch */}
