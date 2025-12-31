@@ -37,10 +37,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6"
         >
-          Your Vision. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
-            Flawless Execution.
-          </span>
+          events from A to Z
         </motion.h1>
 
         <motion.p

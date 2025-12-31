@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
-import { Application } from "@/services/storage";
+import { Application, Inquiry } from "@/services/storage";
 import {
   LayoutDashboard,
   Users,
@@ -24,7 +24,25 @@ interface Profile {
   id: string;
   role: string;
   full_name: string;
+  email: string;
 }
+
+interface SupabaseApplication {
+    id: number;
+    created_at: string;
+    name: string;
+    email: string;
+    phone: string;
+    type: "beginner" | "expert";
+    university?: string;
+    age?: string;
+    motivation?: string;
+    specialty?: string;
+    portfolio?: string;
+    experience?: string;
+    status: "pending" | "reviewed" | "accepted" | "rejected";
+}
+
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -33,10 +51,11 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("pipeline");
 
   // Data States
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<SupabaseApplication[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [inquiries] = useState<Inquiry[]>([]);
   const [formsEnabled, setFormsEnabled] = useState<boolean>(true);
 
   // Filters
@@ -141,7 +160,7 @@ export default function AdminDashboard() {
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <SidebarItem icon={<Users size={20} />} label="Talent Pipeline" active={activeTab === "pipeline"} onClick={() => setActiveTab("pipeline")} />
-          <SidebarItem icon={<MessageSquare size={20} />} label="Inquiries" active={activeTab === "inquiries"} onClick={() => setActiveTab("inquiries")} />
+          <SidebarItem icon={<MessageSquare size={20} />} label="Inquiries" active={activeTab === "inquiries"} onClick={() => setActiveTab("inquiries")} badge={inquiries.filter(i => i.status === 'new').length} />
           <SidebarItem icon={<Shield size={20} />} label="Users" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
           <SidebarItem icon={<Settings size={20} />} label="Settings" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
         </nav>
@@ -163,7 +182,7 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Talent Pipeline</h2>
-              {/* ... (search and filter UI) */}
+              {/* Search and filter UI remains the same */}
             </div>
             {appsLoading ? <div className="text-center py-20">Loading...</div> :
             <div className="grid grid-cols-1 gap-4">
@@ -174,41 +193,71 @@ export default function AdminDashboard() {
           </div>
         )}
         {activeTab === "users" && (
-            <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-white">User Management</h2>
-                {usersLoading ? <div className="text-center py-20">Loading...</div> :
-                <div className="bg-[#1e293b] rounded-xl border border-white/5 overflow-hidden">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-[#0f172a] text-slate-400 uppercase font-medium">
-                            <tr>
-                                <th className="px-6 py-4">User</th>
-                                <th className="px-6 py-4">Role</th>
-                                <th className="px-6 py-4">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {profiles.map(p => (
-                                <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-white">{p.full_name || p.id}</td>
-                                    <td className="px-6 py-4">
-                                        <select value={p.role} onChange={(e) => handleRoleChange(p.id, e.target.value)} className="bg-slate-700 rounded p-1">
-                                            <option value="user">User</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <button onClick={() => saveRoleChange(p.id, p.role)} className="flex items-center gap-2 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                            <Save size={14} /> Save
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>}
-            </div>
+             <div className="space-y-6">
+             <h2 className="text-2xl font-bold text-white">User Management</h2>
+             {usersLoading ? <div className="text-center py-20">Loading...</div> :
+             <div className="bg-[#1e293b] rounded-xl border border-white/5 overflow-hidden">
+                 <table className="w-full text-sm text-left">
+                     <thead className="bg-[#0f172a] text-slate-400 uppercase font-medium">
+                         <tr>
+                             <th className="px-6 py-4">User</th>
+                             <th className="px-6 py-4">Role</th>
+                             <th className="px-6 py-4">Actions</th>
+                         </tr>
+                     </thead>
+                     <tbody className="divide-y divide-white/5">
+                         {profiles.map(p => (
+                             <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                                 <td className="px-6 py-4 font-medium text-white">{p.full_name || p.email}</td>
+                                 <td className="px-6 py-4">
+                                     <select value={p.role} onChange={(e) => handleRoleChange(p.id, e.target.value)} className="bg-slate-700 rounded p-1">
+                                         <option value="user">User</option>
+                                         <option value="admin">Admin</option>
+                                     </select>
+                                 </td>
+                                 <td className="px-6 py-4">
+                                     <button onClick={() => saveRoleChange(p.id, p.role)} className="flex items-center gap-2 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                         <Save size={14} /> Save
+                                     </button>
+                                 </td>
+                             </tr>
+                         ))}
+                     </tbody>
+                 </table>
+             </div>}
+         </div>
         )}
-        {/* ... (other tabs: inquiries, settings) */}
+        {activeTab === "inquiries" && (
+            <div className="text-center py-20 text-slate-500">Inquiries feature coming soon.</div>
+        )}
+        {activeTab === "settings" && (
+           <div className="max-w-2xl">
+              <h2 className="text-2xl font-bold text-white mb-6">System Settings</h2>
+              <div className="bg-[#1e293b] p-6 rounded-xl border border-white/5 space-y-6">
+                 <div className="flex items-center justify-between">
+                    <div>
+                       <h3 className="font-bold text-white mb-1">Recruitment Forms</h3>
+                       <p className="text-sm text-slate-400">Enable or disable public access to the Join Us application forms.</p>
+                    </div>
+                    <button
+                       onClick={toggleForms}
+                       className={cn(
+                          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#1e293b]",
+                          formsEnabled ? "bg-green-500" : "bg-slate-600"
+                       )}
+                       disabled={isUpdating}
+                    >
+                       <span
+                          className={cn(
+                             "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                             formsEnabled ? "translate-x-6" : "translate-x-1"
+                          )}
+                       />
+                    </button>
+                 </div>
+              </div>
+           </div>
+        )}
       </main>
     </div>
   );
@@ -234,7 +283,7 @@ function SidebarItem({ icon, label, active, onClick, badge }: { icon: React.Reac
   );
 }
 
-function ApplicationCard({ app }: { app: any }) {
+function ApplicationCard({ app }: { app: SupabaseApplication }) {
    return (
       <div className="bg-[#1e293b] p-6 rounded-xl border border-white/5 hover:border-blue-500/30 transition-all group">
          <div className="flex justify-between items-start mb-4">
@@ -254,7 +303,9 @@ function ApplicationCard({ app }: { app: any }) {
                </div>
             </div>
          </div>
-         {/* ... (rest of the card) */}
+         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+            {/* ... (rest of the card implementation) */}
+         </div>
       </div>
    );
 }
