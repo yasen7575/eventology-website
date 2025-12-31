@@ -28,7 +28,6 @@ export default async function JoinUs() {
 
     if (error) {
       // If the table is empty or the key doesn't exist, it will error. Default to enabled.
-      console.log("Could not fetch form status, defaulting to enabled:", error.message);
       isEnabled = true;
     } else {
       isEnabled = !data.value;

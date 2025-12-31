@@ -46,7 +46,7 @@ export default function SignupPage() {
                 throw error;
             }
 
-            setMessage("Account created! Please check your email to verify your account.");
+            router.push('/');
 
         } catch (err) {
             setError((err as Error).message);

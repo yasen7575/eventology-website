@@ -17,6 +17,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
+  const [fullName, setFullName] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -36,16 +37,30 @@ export default function Navbar() {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
 
+    const fetchUser = async (sessionUser: User | null) => {
+        if (sessionUser) {
+            setUser(sessionUser);
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', sessionUser.id)
+                .single();
+            setFullName(profile?.full_name || sessionUser.email);
+        } else {
+            setUser(null);
+            setFullName(null);
+        }
+        setLoading(false);
+    }
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      fetchUser(session?.user ?? null);
     });
 
     // Check initial session
     const checkSession = async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setLoading(false);
+        fetchUser(session?.user ?? null);
     };
     checkSession();
 
@@ -60,6 +75,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    setFullName(null);
     setUserMenuOpen(false);
   }
 
@@ -98,9 +114,9 @@ export default function Navbar() {
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-sm font-medium"
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs">
-                    {user.email?.charAt(0).toUpperCase()}
+                    {fullName?.charAt(0).toUpperCase()}
                   </div>
-                  <span>{user.email}</span>
+                  <span>{fullName}</span>
                   <ChevronDown size={14} className={cn("transition-transform", userMenuOpen && "rotate-180")} />
                 </button>
 

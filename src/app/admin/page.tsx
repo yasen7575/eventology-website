@@ -57,6 +57,7 @@ export default function AdminDashboard() {
   const [usersLoading, setUsersLoading] = useState(false);
   const [inquiries] = useState<Inquiry[]>([]);
   const [formsEnabled, setFormsEnabled] = useState<boolean>(true);
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -107,6 +108,7 @@ export default function AdminDashboard() {
 
   const toggleForms = async () => {
     setIsUpdating(true);
+    setSettingsSaved(false);
     const newState = !formsEnabled;
     try {
       const response = await fetch('/api/settings', {
@@ -116,6 +118,8 @@ export default function AdminDashboard() {
       });
       if (!response.ok) throw new Error('Failed to update settings');
       setFormsEnabled(newState);
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 3000);
     } catch (error) { console.error(error); }
     finally { setIsUpdating(false); }
   };
@@ -255,6 +259,7 @@ export default function AdminDashboard() {
                        />
                     </button>
                  </div>
+                 {settingsSaved && <p className="text-green-400 text-sm">Settings saved!</p>}
               </div>
            </div>
         )}
@@ -304,7 +309,36 @@ function ApplicationCard({ app }: { app: SupabaseApplication }) {
             </div>
          </div>
          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-            {/* ... (rest of the card implementation) */}
+            <div>
+                <span className="text-xs text-slate-500">Email</span>
+                <p className="text-white font-medium">{app.email}</p>
+            </div>
+            <div>
+                <span className="text-xs text-slate-500">Phone</span>
+                <p className="text-white font-medium">{app.phone}</p>
+            </div>
+            <div>
+                <span className="text-xs text-slate-500">University</span>
+                <p className="text-white font-medium">{app.university || 'N/A'}</p>
+            </div>
+            <div>
+                <span className="text-xs text-slate-500">Age</span>
+                <p className="text-white font-medium">{app.age || 'N/A'}</p>
+            </div>
+             <div>
+                <span className="text-xs text-slate-500">Specialty</span>
+                <p className="text-white font-medium">{app.specialty || 'N/A'}</p>
+            </div>
+            {app.portfolio && <div>
+                <span className="text-xs text-slate-500">Portfolio</span>
+                <a href={app.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
+                    View Portfolio <LinkIcon size={12} />
+                </a>
+            </div>}
+         </div>
+         <div>
+            <span className="text-xs text-slate-500">Motivation</span>
+            <p className="text-white text-sm bg-black/20 p-3 rounded-lg mt-1">{app.motivation || 'No motivation provided.'}</p>
          </div>
       </div>
    );
