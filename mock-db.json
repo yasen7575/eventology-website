@@ -1,0 +1,41 @@
+{
+  "applications": [
+    {
+      "name": "Test Candidate",
+      "email": "test@candidate.com",
+      "phone": "0123456789",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "specialty": null,
+      "portfolio": null,
+      "experience": null,
+      "id": "1735678123456",
+      "created_at": "2025-12-31T20:00:00.000Z",
+      "status": "pending"
+    },
+    {
+      "name": "Test Candidate",
+      "email": "test@candidate.com",
+      "phone": "0123456789",
+      "type": "beginner",
+      "university": "Test University",
+      "age": "25",
+      "motivation": "I want to learn.",
+      "specialty": null,
+      "portfolio": null,
+      "experience": null,
+      "id": "1767209242502",
+      "created_at": "2025-12-31T19:27:22.502Z"
+    }
+  ],
+  "users": [],
+  "profiles": [],
+  "settings": [
+    {
+      "key": "join_form_locked",
+      "value": false
+    }
+  ]
+}
